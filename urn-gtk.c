@@ -342,8 +342,8 @@ static gboolean urn_app_window_draw(gpointer data) {
         } else {
             // Previous segment
             label = PREVIOUS_SEGMENT;
-            if (curr) {
-                int prev = curr - 1;
+            if (win->timer->curr_split) {
+                int prev = win->timer->curr_split - 1;
                 if (win->timer->split_info[prev]
                     & URN_INFO_BEST_SEGMENT) {
                     gtk_widget_override_color(
