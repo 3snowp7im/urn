@@ -171,8 +171,9 @@ static void urn_app_window_split(UrnAppWindow *win) {
     // personal best
     if (win->game->split_count) {
         if (win->timer->split_times[win->game->split_count - 1]
-            && win->timer->split_times[win->game->split_count - 1]
-            < win->game->split_times[win->game->split_count - 1]) {
+            && !win->game->split_times[win->game->split_count - 1]
+            || (win->timer->split_times[win->game->split_count - 1]
+                < win->game->split_times[win->game->split_count - 1])) {
             urn_time_string(str, win->timer->split_times[win->game->split_count - 1]);
             gtk_label_set_text(GTK_LABEL(win->personal_best), str);
         } else if (win->game->split_times[win->game->split_count - 1]) {
