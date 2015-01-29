@@ -109,6 +109,16 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     gtk_label_set_text(GTK_LABEL(win->personal_best), "");
 }
 
+static void urn_app_window_start(UrnAppWindow *win) {
+    if (win->split_count) {
+        // highlight first split
+        gtk_widget_override_background_color(
+            win->splits[0],
+            GTK_STATE_NORMAL,
+            &win->current_segment);
+    }
+}
+
 static void urn_app_window_split(UrnAppWindow *win) {
     int prev = win->timer->curr_split - 1;
     char str[256];
@@ -174,10 +184,12 @@ static void urn_app_window_split(UrnAppWindow *win) {
             && !win->game->split_times[win->game->split_count - 1]
             || (win->timer->split_times[win->game->split_count - 1]
                 < win->game->split_times[win->game->split_count - 1])) {
-            urn_time_string(str, win->timer->split_times[win->game->split_count - 1]);
+            urn_time_string(
+                str, win->timer->split_times[win->game->split_count - 1]);
             gtk_label_set_text(GTK_LABEL(win->personal_best), str);
         } else if (win->game->split_times[win->game->split_count - 1]) {
-            urn_time_string(str, win->game->split_times[win->game->split_count - 1]);
+            urn_time_string(
+                str, win->game->split_times[win->game->split_count - 1]);
             gtk_label_set_text(GTK_LABEL(win->personal_best), str);
         }
     }
@@ -231,10 +243,6 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         }
     }
     if (win->split_count) {
-        // highlight current split
-        gtk_widget_override_background_color(win->splits[0],
-                                             GTK_STATE_NORMAL,
-                                             &win->current_segment);
         // sum of bests
         if (win->timer->sum_of_bests) {
             urn_time_string(str, win->timer->sum_of_bests);
@@ -242,7 +250,8 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         }
         // personal best
         if (win->game->split_times[win->game->split_count - 1]) {
-            urn_time_string(str, win->game->split_times[win->game->split_count - 1]);
+            urn_time_string(
+                str, win->game->split_times[win->game->split_count - 1]);
             gtk_label_set_text(GTK_LABEL(win->personal_best), str);
         }
     }
@@ -277,6 +286,7 @@ static gboolean urn_app_window_key(GtkWidget *widget,
             if (win->timer) {
                 if (!win->timer->running) {
                     urn_timer_start(win->timer);
+                    urn_app_window_start(win);
                 } else {
                     if (urn_timer_split(win->timer)) {
                         urn_app_window_split(win);
