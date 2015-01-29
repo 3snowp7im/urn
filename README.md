@@ -5,10 +5,6 @@ It was originally written because there were no exisiting
 solutions for split tracking with a delayed start available
 on *nix platforms.
 
-The menu requires zenity. You are able to build and run
-urn without zenity, you just won't get a menu when you
-press the Escape key.
-
 # Usage
 
 Without a game loaded, the timer looks like an empty,
