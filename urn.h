@@ -47,6 +47,8 @@ long long urn_time_value(const char *string);
 
 void urn_time_string(char *string, long long time);
 
+void urn_time_millis_string(char *seconds, char *millis, long long time);
+
 void urn_split_string(char *string, long long time);
 
 void urn_delta_string(char *string, long long time);
@@ -65,7 +67,7 @@ int urn_timer_create(urn_timer **timer_ptr, const urn_game *game);
 
 void urn_timer_release(urn_timer *timer);
 
-void urn_timer_start(urn_timer *timer);
+int urn_timer_start(urn_timer *timer);
 
 void urn_timer_step(urn_timer *timer, long long now);
 

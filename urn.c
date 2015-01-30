@@ -46,13 +46,14 @@ long long urn_time_value(const char *string) {
 }
 
 static void urn_time_string_format(char *string,
+                                   char *millis,
                                    long long time,
                                    int serialized,
                                    int delta,
                                    int compact) {
     int hours, minutes, seconds;
     double subseconds;
-    char real[256];
+    char buf[256];
     const char *sign = "";
     if (time < 0) {
         time = -time;
@@ -65,45 +66,52 @@ static void urn_time_string_format(char *string,
     seconds = (time / 1000000L) % 60;
     subseconds = (time % 1000000L) / 1000000.;
     if (serialized) {
-        sprintf(real, "%.6f", subseconds);
+        sprintf(buf, "%.6f", subseconds);
     } else {
-        sprintf(real, "%.2f", subseconds);
+        sprintf(buf, "%.2f", subseconds);
+    }
+    if (millis) {
+        strcpy(millis, &buf[2]);
+        buf[1] = '\0';
     }
     if (hours) {
         if (!compact) {
             sprintf(string, "%s%d:%02d:%02d%s",
-                    sign, hours, minutes, seconds, &real[1]);
+                    sign, hours, minutes, seconds, &buf[1]);
         } else {
             sprintf(string, "%s%d:%02d", sign, hours, minutes);
         }
     } else if (minutes) {
         if (!compact) {
             sprintf(string, "%s%d:%02d%s",
-                    sign, minutes, seconds, &real[1]);
+                    sign, minutes, seconds, &buf[1]);
         } else {
             sprintf(string, "%s%d:%02d", sign, minutes, seconds);
         }
     } else {
-        sprintf(string, "%s%d%s", sign, seconds, &real[1]);
+        sprintf(string, "%s%d%s", sign, seconds, &buf[1]);
     }
 }
 
-
 static void urn_time_string_serialized(char *string,
                                        long long time) {
-    urn_time_string_format(string, time, 1, 0, 0);
+    urn_time_string_format(string, NULL, time, 1, 0, 0);
 }
 
 void urn_time_string(char *string, long long time) {
-    urn_time_string_format(string, time, 0, 0, 0);
+    urn_time_string_format(string, NULL, time, 0, 0, 0);
+}
+
+void urn_time_millis_string(char *seconds, char *millis, long long time) {
+    urn_time_string_format(seconds, millis, time, 0, 0, 0);
 }
 
 void urn_split_string(char *string, long long time) {
-    urn_time_string_format(string, time, 0, 0, 1);
+    urn_time_string_format(string, NULL, time, 0, 0, 1);
 }
 
 void urn_delta_string(char *string, long long time) {
-    urn_time_string_format(string, time, 0, 1, 1);
+    urn_time_string_format(string, NULL, time, 0, 1, 1);
 }
 
 void urn_game_release(urn_game *game) {
@@ -498,13 +506,14 @@ void urn_timer_step(urn_timer *timer, long long now) {
     }
 }
 
-void urn_timer_start(urn_timer *timer) {
+int urn_timer_start(urn_timer *timer) {
     if (timer->curr_split < timer->game->split_count) {
         if (!timer->start_time) {
             timer->start_time = timer->now + timer->game->start_delay;
         }
         timer->running = 1;
     }
+    return timer->running;
 }
 
 int urn_timer_split(urn_timer *timer) {
