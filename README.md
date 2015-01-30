@@ -37,10 +37,12 @@ The color of a time or delta has special meaning.
 | Key          | Value                                 |
 |--------------|---------------------------------------|
 | title        | Title string at top of window         |
-| style        | CSS style string                      |
 | start_delay  | Non-negative delay until timer starts |
 | world_record | Best known time                       |
 | splits       | Array of split objects                |
+| style        | CSS style string                      |
+| width        | Window width                          |
+| height       | Window height                         |
 
 ## Split object
 
@@ -53,16 +55,18 @@ The color of a time or delta has special meaning.
 
 # Styled elements
 
-| Class            | Description                 |
-|------------------|-----------------------------|
-| .window          | The main timer window       |
-| .timer           | The current running time    |
-| .delay           | Negative running time value |
-| .current-segment | Current segment             |
-| .split-time      | Split time                  |
-| .done            | Finished splits             |
-| .split-delta     | Split time delta            |
-| .behind          | Behind time                 |
-| .losing          | Losing time                 |
-| .best-segment    | Best segment time           |
-| .best-split      | Best split time             |
+| Class          | Description                 |
+|----------------|-----------------------------|
+| .window        | The main timer window       |
+| .title         | Title string                |
+| .timer         | The current running time    |
+| .delay         | Negative running time value |
+| .current-split | Current split               |
+| .split-title   | Split title string          |
+| .split-time    | Split time                  |
+| .split-delta   | Split time delta            |
+| .done          | Finished splits             |
+| .behind        | Behind time                 |
+| .losing        | Losing time                 |
+| .best-segment  | Best segment time           |
+| .best-split    | Best split time             |

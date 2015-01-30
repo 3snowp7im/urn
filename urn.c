@@ -182,6 +182,16 @@ int urn_game_create(urn_game **game_ptr, const char *path) {
             goto game_create_done;
         }
     }
+    // get width
+    ref = json_object_get(json, "width");
+    if (ref) {
+        game->width = json_integer_value(ref);
+    }
+    // get height
+    ref = json_object_get(json, "height");
+    if (ref) {
+        game->height = json_integer_value(ref);
+    }
     // get delay
     ref = json_object_get(json, "start_delay");
     if (ref) {
@@ -335,6 +345,15 @@ int urn_game_save(const urn_game *game) {
     if (!json_dump_file(json, game->path,
                         JSON_PRESERVE_ORDER | JSON_INDENT(2))) {
         error = 1;
+    }
+    if (game->style) {
+        json_object_set_new(json, "style", json_string(game->style));
+    }
+    if (game->width) {
+        json_object_set_new(json, "width", json_integer(game->width));
+    }
+    if (game->height) {
+        json_object_set_new(json, "height", json_integer(game->height));
     }
     json_decref(json);
     return error;

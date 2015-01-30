@@ -28,10 +28,17 @@ typedef struct _UrnAppClass  UrnAppClass;
 typedef struct _UrnAppWindow         UrnAppWindow;
 typedef struct _UrnAppWindowClass    UrnAppWindowClass;
 
+#define WINDOW_WIDTH  (320)
+#define WINDOW_HEIGHT (240)
+
 static const char *urn_app_window_style =
     ".window {\n"
     "  background-color: #000;\n"
     "  color: #FFF;\n"
+    "}\n"
+
+    ".title {\n"
+    "  font-size: 10pt;\n"
     "}\n"
 
     ".timer {\n"
@@ -52,19 +59,19 @@ static const char *urn_app_window_style =
     "}\n"
 
     ".timer, .split-delta {\n"
-    "  color: #0F0;\n"
+    "  color: #0C0;\n"
     "}\n"
 
     ".losing {\n"
-    "  color: #9F9;\n"
+    "  color: #6A6;\n"
     "}\n"
 
     ".behind {\n"
-    "  color: #F99;\n"
+    "  color: #A66;\n"
     "}\n"
 
     ".behind.losing {\n"
-    "  color: #F00;\n"
+    "  color: #C00;\n"
     "}\n"
 
     ".split-delta.best-segment {\n"
@@ -75,7 +82,7 @@ static const char *urn_app_window_style =
     "  color: #99F;\n"
     "}\n"
 
-    ".current-segment {\n"
+    ".current-split {\n"
     "  background-color: #336;\n"
     "}\n"
     ;
@@ -154,7 +161,7 @@ static void urn_app_window_start(UrnAppWindow *win) {
         // highlight first split
         gtk_style_context_add_class(
             gtk_widget_get_style_context(win->splits[0]),
-            "current-segment");
+            "current-split");
     }
 }
 
@@ -163,11 +170,11 @@ static void urn_app_window_split(UrnAppWindow *win) {
     char str[256];
     gtk_style_context_remove_class(
         gtk_widget_get_style_context(win->splits[prev]),
-        "current-segment");
+        "current-split");
     if (win->timer->curr_split < win->game->split_count) {
         gtk_style_context_add_class(
             gtk_widget_get_style_context(win->splits[win->timer->curr_split]),
-            "current-segment");
+            "current-split");
     }
     gtk_style_context_add_class(
         gtk_widget_get_style_context(win->split_times[prev]),
@@ -258,6 +265,13 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
     
     char *style = 0;
 
+    // set dimensions
+    if (win->game->width > 0 && win->game->height > 0) {
+        gtk_window_set_default_size(GTK_WINDOW(win),
+                                    win->game->width, win->game->height);
+    }
+
+    // merge css
     if (win->game->style) {
         int app_style_len = strlen(urn_app_window_style);
         style = malloc(strlen(win->game->style) + 1 + app_style_len + 1);
@@ -267,7 +281,8 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
     } else {
         style = strdup(urn_app_window_style);
     }
-    
+
+    // set window css provider
     provider = gtk_css_provider_new();
     display = gdk_display_get_default();
     screen = gdk_display_get_default_screen(display);
@@ -298,6 +313,9 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         gtk_container_add(GTK_CONTAINER(win->split_box), win->splits[i]);
         gtk_widget_show(win->splits[i]);
         win->split_titles[i] = gtk_label_new(win->game->split_titles[i]);
+        gtk_style_context_add_class(
+            gtk_widget_get_style_context(win->split_titles[i]),
+            "split-title");
         gtk_widget_set_halign(win->split_titles[i], GTK_ALIGN_START);
         gtk_grid_attach(GTK_GRID(win->splits[i]),
                         win->split_titles[i], 0, 0, 3, 1);
@@ -539,7 +557,6 @@ static gboolean urn_app_window_draw(gpointer data) {
 
 
 static void urn_app_window_init(UrnAppWindow *win) {
-    PangoFontDescription *font;
     GtkWidget *label;
 
     // Load CSS defaults
@@ -568,7 +585,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
                      G_CALLBACK(urn_app_window_destroy), NULL);
     g_signal_connect(win, "key_press_event",
                      G_CALLBACK(urn_app_window_key), win);
-    gtk_window_set_default_size(GTK_WINDOW(win), 320, 240);
+    gtk_window_set_default_size(GTK_WINDOW(win), WINDOW_WIDTH, WINDOW_HEIGHT);
     
     win->box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_margin_left(win->box, 8);
@@ -579,9 +596,8 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_container_add(GTK_CONTAINER(win), win->box);
     
     win->title = gtk_label_new(NULL);
-    font = pango_font_description_new();
-    pango_font_description_set_size(font, 14*PANGO_SCALE);
-    gtk_widget_override_font(win->title, font);
+    gtk_style_context_add_class(
+        gtk_widget_get_style_context(win->title), "title");
     gtk_container_add(GTK_CONTAINER(win->box), win->title);
     gtk_widget_show(win->title);
 
@@ -754,6 +770,10 @@ static void save_activated(GSimpleAction *action,
         win = urn_app_window_new(URN_APP(app));
     }
     if (win->game && win->timer) {
+        int width, height;
+        gtk_window_get_size(GTK_WINDOW(win), &width, &height);
+        win->game->width = width;
+        win->game->height = height;
         urn_game_update_splits(win->game, win->timer);
         urn_game_save(win->game);
     }
