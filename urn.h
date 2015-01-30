@@ -73,6 +73,10 @@ void urn_timer_step(urn_timer *timer, long long now);
 
 int urn_timer_split(urn_timer *timer);
 
+int urn_timer_skip(urn_timer *timer);
+
+int urn_timer_unsplit(urn_timer *timer);
+
 void urn_timer_stop(urn_timer *timer);
 
 void urn_timer_reset(urn_timer *timer);

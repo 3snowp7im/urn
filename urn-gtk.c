@@ -103,7 +103,7 @@ struct _UrnAppWindow {
     GtkWidget **split_titles;
     GtkWidget **split_deltas;
     GtkWidget **split_times;
-    GtkWidget *trailer;
+    GtkWidget *footer;
     GtkWidget *sum_of_bests;
     GtkWidget *previous_segment_label;
     GtkWidget *previous_segment;
@@ -137,13 +137,21 @@ static void urn_app_window_destroy(GtkWidget *widget, gpointer data) {
 #define PERSONAL_BEST         "Personal best"
 #define WORLD_RECORD          "World record"
 
+static void add_class(GtkWidget *widget, const char *class) {
+    gtk_style_context_add_class(gtk_widget_get_style_context(widget), class);
+}
+
+static void remove_class(GtkWidget *widget, const char *class) {
+    gtk_style_context_remove_class(gtk_widget_get_style_context(widget), class);
+}
+
 static void urn_app_window_clear_game(UrnAppWindow *win) {
     int i;
     gtk_widget_hide(win->box);
     if (win->game->world_record) {
-        gtk_container_remove(GTK_CONTAINER(win->trailer),
+        gtk_container_remove(GTK_CONTAINER(win->footer),
                              win->world_record_label);
-        gtk_container_remove(GTK_CONTAINER(win->trailer),
+        gtk_container_remove(GTK_CONTAINER(win->footer),
                              win->world_record);
         win->world_record_label = 0;
         win->world_record = 0;
@@ -164,96 +172,6 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     gtk_label_set_text(GTK_LABEL(win->previous_segment), "");
     gtk_label_set_text(GTK_LABEL(win->sum_of_bests), "");
     gtk_label_set_text(GTK_LABEL(win->personal_best), "");
-}
-
-static void urn_app_window_start(UrnAppWindow *win) {
-    if (win->split_count) {
-        // highlight first split
-        gtk_style_context_add_class(
-            gtk_widget_get_style_context(win->splits[0]),
-            "current-split");
-    }
-}
-
-static void urn_app_window_split(UrnAppWindow *win) {
-    int prev = win->timer->curr_split - 1;
-    char str[256];
-    gtk_style_context_remove_class(
-        gtk_widget_get_style_context(win->splits[prev]),
-        "current-split");
-    if (win->timer->curr_split < win->game->split_count) {
-        gtk_style_context_add_class(
-            gtk_widget_get_style_context(win->splits[win->timer->curr_split]),
-            "current-split");
-    }
-    gtk_style_context_add_class(
-        gtk_widget_get_style_context(win->split_times[prev]),
-        "done");
-    urn_split_string(str, win->timer->split_times[prev]);
-    gtk_label_set_text(GTK_LABEL(win->split_times[prev]), str);
-    if (win->timer->split_info[prev] & URN_INFO_BEST_SPLIT) {
-        gtk_style_context_add_class(
-            gtk_widget_get_style_context(win->split_deltas[prev]),
-            "best-split");
-    } else if (win->timer->split_info[prev]
-               & URN_INFO_BEST_SEGMENT) {
-        gtk_style_context_add_class(
-            gtk_widget_get_style_context(win->split_deltas[prev]),
-            "best-segment");
-    } else if (win->timer->split_info[prev]
-               & URN_INFO_BEHIND_TIME) {
-        gtk_style_context_add_class(
-            gtk_widget_get_style_context(win->split_deltas[prev]),
-            "behind");
-        if (win->timer->split_info[prev]
-            & URN_INFO_LOSING_TIME) {
-            gtk_style_context_add_class(
-                gtk_widget_get_style_context(win->split_deltas[prev]),
-                "losing");
-        } else {
-            gtk_style_context_remove_class(
-                gtk_widget_get_style_context(win->split_deltas[prev]),
-                "losing");
-        }
-    } else {
-        gtk_style_context_remove_class(
-            gtk_widget_get_style_context(win->split_deltas[prev]),
-            "behind");
-        if (win->timer->split_info[prev]
-            & URN_INFO_LOSING_TIME) {
-            gtk_style_context_add_class(
-                gtk_widget_get_style_context(win->split_deltas[prev]),
-                "losing");
-        } else {
-            gtk_style_context_remove_class(
-                gtk_widget_get_style_context(win->split_deltas[prev]),
-                "losing");
-        }
-    }
-    if (win->timer->split_deltas[prev]) {
-        urn_delta_string(str, win->timer->split_deltas[prev]);
-        gtk_label_set_text(GTK_LABEL(win->split_deltas[prev]), str);
-    }
-    // sum of bests
-    if (win->timer->sum_of_bests) {
-        urn_time_string(str, win->timer->sum_of_bests);
-        gtk_label_set_text(GTK_LABEL(win->sum_of_bests), str);
-    }
-    // personal best
-    if (win->game->split_count) {
-        if (win->timer->split_times[win->game->split_count - 1]
-            && !win->game->split_times[win->game->split_count - 1]
-            || (win->timer->split_times[win->game->split_count - 1]
-                < win->game->split_times[win->game->split_count - 1])) {
-            urn_time_string(
-                str, win->timer->split_times[win->game->split_count - 1]);
-            gtk_label_set_text(GTK_LABEL(win->personal_best), str);
-        } else if (win->game->split_times[win->game->split_count - 1]) {
-            urn_time_string(
-                str, win->game->split_times[win->game->split_count - 1]);
-            gtk_label_set_text(GTK_LABEL(win->personal_best), str);
-        }
-    }
 }
 
 static gboolean urn_app_window_step(gpointer data) {
@@ -323,24 +241,18 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         gtk_container_add(GTK_CONTAINER(win->split_box), win->splits[i]);
         gtk_widget_show(win->splits[i]);
         win->split_titles[i] = gtk_label_new(win->game->split_titles[i]);
-        gtk_style_context_add_class(
-            gtk_widget_get_style_context(win->split_titles[i]),
-            "split-title");
+        add_class(win->split_titles[i], "split-title");
         gtk_widget_set_halign(win->split_titles[i], GTK_ALIGN_START);
         gtk_grid_attach(GTK_GRID(win->splits[i]),
                         win->split_titles[i], 0, 0, 3, 1);
         gtk_widget_show(win->split_titles[i]);
         win->split_deltas[i] = gtk_label_new(NULL);
-        gtk_style_context_add_class(
-            gtk_widget_get_style_context(win->split_deltas[i]),
-            "split-delta");
+        add_class(win->split_deltas[i], "split-delta");
         gtk_grid_attach(GTK_GRID(win->splits[i]),
                         win->split_deltas[i], 3, 0, 1, 1);
         gtk_widget_show(win->split_deltas[i]);
         win->split_times[i] = gtk_label_new(NULL);
-        gtk_style_context_add_class(
-            gtk_widget_get_style_context(win->split_times[i]),
-            "split-time");
+        add_class(win->split_times[i], "split-time");
         gtk_widget_set_halign(win->split_times[i], GTK_ALIGN_END);
         gtk_grid_attach(GTK_GRID(win->splits[i]),
                         win->split_times[i], 4, 0, 1, 1);
@@ -364,22 +276,12 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         }
     }
     
-    gtk_style_context_remove_class(
-        gtk_widget_get_style_context(win->previous_segment),
-        "behind");
-    gtk_style_context_remove_class(
-        gtk_widget_get_style_context(win->previous_segment),
-        "losing");
-    gtk_style_context_remove_class(
-        gtk_widget_get_style_context(win->previous_segment),
-        "best-segment");
+    remove_class(win->previous_segment, "behind");
+    remove_class(win->previous_segment, "losing");
+    remove_class(win->previous_segment, "best-segment");
 
-    gtk_style_context_remove_class(
-        gtk_widget_get_style_context(win->time),
-        "behind");
-    gtk_style_context_remove_class(
-        gtk_widget_get_style_context(win->time),
-        "losing");
+    remove_class(win->time, "behind");
+    remove_class(win->time, "losing");
 
     if (win->game->world_record) {
         char str[64];
@@ -391,9 +293,9 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         gtk_widget_set_halign(win->world_record, GTK_ALIGN_END);
         urn_time_string(str, win->game->world_record);
         gtk_label_set_text(GTK_LABEL(win->world_record), str);
-        gtk_grid_attach(GTK_GRID(win->trailer),
+        gtk_grid_attach(GTK_GRID(win->footer),
                         win->world_record_label, 0, 3, 1, 1);
-        gtk_grid_attach(GTK_GRID(win->trailer),
+        gtk_grid_attach(GTK_GRID(win->footer),
                         win->world_record, 1, 3, 1, 1);
         gtk_widget_show(win->world_record);
     }
@@ -404,119 +306,147 @@ static gboolean urn_app_window_key(GtkWidget *widget,
                                    GdkEventKey *event,
                                    gpointer data) {
     UrnAppWindow *win = (UrnAppWindow*)widget;
-    if (event->string && strlen(event->string)) {
-        int key = (int)event->string[0];
-        switch (key) {
-        case 32:
-            if (win->timer) {
-                if (!win->timer->running) {
-                    if (urn_timer_start(win->timer)) {
-                        urn_app_window_start(win);
-                    }
-                } else {
-                    if (urn_timer_split(win->timer)) {
-                        urn_app_window_split(win);
-                    }
-                }
+    switch (event->keyval) {
+    case GDK_KEY_space:
+        if (win->timer) {
+            if (!win->timer->running) {
+                urn_timer_start(win->timer);
+            } else {
+                urn_timer_split(win->timer);
             }
-            break;
-        case 8:
-            if (win->timer) {
-                if (win->timer->running) {
-                    urn_timer_stop(win->timer);
-                } else {
-                    urn_timer_reset(win->timer);
-                    urn_app_window_clear_game(win);
-                    urn_app_window_show_game(win);
-                }
-            }
-            break;
         }
+        break;
+    case GDK_KEY_BackSpace:
+        if (win->timer) {
+            if (win->timer->running) {
+                urn_timer_stop(win->timer);
+            } else {
+                urn_timer_reset(win->timer);
+                urn_app_window_clear_game(win);
+                urn_app_window_show_game(win);
+            }
+        }
+        break;
+    case GDK_KEY_Page_Down:
+        if (win->timer) {
+            urn_timer_skip(win->timer);
+        }
+        break;
+    case GDK_KEY_Page_Up:
+        if (win->timer) {
+            urn_timer_unsplit(win->timer);
+        }
+        break;
     }
     return TRUE;
 }
+
+#define SHOW_DELTA_THRESHOLD (-30 * 1000000L)
 
 static gboolean urn_app_window_draw(gpointer data) {
     UrnAppWindow *win = data;
     if (win->timer) {
         int curr;
+        int prev;
         char str[256];
         char millis[256];
         const char *label;
+        int i;
 
         curr = win->timer->curr_split;
         if (curr == win->game->split_count) {
             --curr;
         }
 
-        // current split
-        if (win->timer->split_deltas[curr] > 0) {
-            gtk_style_context_add_class(
-                gtk_widget_get_style_context(win->split_deltas[curr]),
-                "behind");
-            if (win->timer->split_info[curr]
-                & URN_INFO_LOSING_TIME) {
-                gtk_style_context_add_class(
-                    gtk_widget_get_style_context(win->split_deltas[curr]),
-                    "losing");
+        // splits
+        for (i = 0; i < win->split_count; ++i) {
+            if (i == curr && win->timer->start_time) {
+                add_class(win->splits[i], "current-split");
             } else {
-                gtk_style_context_remove_class(
-                    gtk_widget_get_style_context(win->split_deltas[curr]),
-                    "losing");
+                remove_class(win->splits[i], "current-split");
             }
-            urn_delta_string(str, win->timer->split_deltas[curr]);
-            gtk_label_set_text(GTK_LABEL(win->split_deltas[curr]), str);
+            if (i < win->timer->curr_split) {
+                add_class(win->split_times[i], "done");
+            } else {
+                remove_class(win->split_times[i], "done");
+            }
+            
+            gtk_label_set_text(GTK_LABEL(win->split_times[i]), "");
+            if (i < curr) {
+                if (win->timer->split_times[i]) {
+                    urn_split_string(str, win->timer->split_times[i]);
+                    gtk_label_set_text(GTK_LABEL(win->split_times[i]), str);
+                }
+            } else if (win->game->split_times[i]) {
+                urn_split_string(str, win->game->split_times[i]);
+                gtk_label_set_text(GTK_LABEL(win->split_times[i]), str);
+            }
+            
+            gtk_label_set_text(GTK_LABEL(win->split_deltas[i]), "");
+            remove_class(win->split_deltas[i], "best-split");
+            remove_class(win->split_deltas[i], "best-segment");
+            remove_class(win->split_deltas[i], "behind");
+            remove_class(win->split_deltas[i], "losing");
+            if (win->timer->time > 0
+                && (i < curr
+                    || win->timer->split_deltas[i] >= SHOW_DELTA_THRESHOLD)) {
+                if (win->timer->split_info[i] & URN_INFO_BEST_SPLIT) {
+                    add_class(win->split_deltas[i], "best-split");
+                } else if (win->timer->split_info[i]
+                           & URN_INFO_BEST_SEGMENT) {
+                    add_class(win->split_deltas[i], "best-segment");
+                } else if (win->timer->split_info[i]
+                           & URN_INFO_BEHIND_TIME) {
+                    add_class(win->split_deltas[i], "behind");
+                    if (win->timer->split_info[i]
+                        & URN_INFO_LOSING_TIME) {
+                        add_class(win->split_deltas[i], "losing");
+                    }
+                } else {
+                    remove_class(win->split_deltas[i], "behind");
+                    if (win->timer->split_info[i]
+                        & URN_INFO_LOSING_TIME) {
+                        add_class(win->split_deltas[i], "losing");
+                    }
+                }
+                if (win->timer->split_deltas[i]) {
+                    urn_delta_string(str, win->timer->split_deltas[i]);
+                    gtk_label_set_text(GTK_LABEL(win->split_deltas[i]), str);
+                }
+            }
         }
 
+        // Previous segment
+        label = PREVIOUS_SEGMENT;
+        remove_class(win->previous_segment, "best-segment");
+        remove_class(win->previous_segment, "behind");
+        remove_class(win->previous_segment, "losing");
+        gtk_label_set_text(GTK_LABEL(win->previous_segment), "");
         if (win->timer->segment_deltas[curr] > 0) {
             // Live segment
             label = LIVE_SEGMENT;
-            gtk_style_context_remove_class(
-                gtk_widget_get_style_context(win->previous_segment),
-                "best-segment");
-            gtk_style_context_add_class(
-                gtk_widget_get_style_context(win->previous_segment),
-                "behind");
-            gtk_style_context_add_class(
-                gtk_widget_get_style_context(win->previous_segment),
-                "losing");
+            remove_class(win->previous_segment, "best-segment");
+            add_class(win->previous_segment, "behind");
+            add_class(win->previous_segment, "losing");
             urn_delta_string(str, win->timer->segment_deltas[curr]);
             gtk_label_set_text(GTK_LABEL(win->previous_segment), str);
-        } else {
+        } else if (curr) {
+            prev = win->timer->curr_split - 1;
             // Previous segment
-            label = PREVIOUS_SEGMENT;
             if (win->timer->curr_split) {
                 int prev = win->timer->curr_split - 1;
                 if (win->timer->segment_deltas[prev]) {
                     if (win->timer->split_info[prev]
                         & URN_INFO_BEST_SEGMENT) {
-                        gtk_style_context_add_class(
-                            gtk_widget_get_style_context(
-                                win->previous_segment),
-                            "best-segment");
+                        add_class(win->previous_segment, "best-segment");
                     } else {
-                        gtk_style_context_remove_class(
-                            gtk_widget_get_style_context(
-                                win->previous_segment),
-                            "best-segment");
+                        remove_class(win->previous_segment, "best-segment");
                         if (win->timer->segment_deltas[prev] > 0) {
-                            gtk_style_context_add_class(
-                                gtk_widget_get_style_context(
-                                    win->previous_segment),
-                                "behind");
-                            gtk_style_context_add_class(
-                                gtk_widget_get_style_context(
-                                    win->previous_segment),
-                                "losing");
+                            add_class(win->previous_segment, "behind");
+                            add_class(win->previous_segment, "losing");
                         } else {
-                            gtk_style_context_remove_class(
-                                gtk_widget_get_style_context(
-                                    win->previous_segment),
-                                "behind");
-                            gtk_style_context_remove_class(
-                                gtk_widget_get_style_context(
-                                    win->previous_segment),
-                                "losing");
+                            remove_class(win->previous_segment, "behind");
+                            remove_class(win->previous_segment, "losing");
                         }
                     }
                     urn_delta_string(str, win->timer->segment_deltas[prev]);
@@ -531,41 +461,25 @@ static gboolean urn_app_window_draw(gpointer data) {
             curr = win->game->split_count - 1;
         }
         if (win->timer->time < 0) {
-            gtk_style_context_add_class(
-                gtk_widget_get_style_context(win->time),
-                "delay");
+            add_class(win->time, "delay");
         } else {
-            gtk_style_context_remove_class(
-                gtk_widget_get_style_context(win->time),
-                "delay");
+            remove_class(win->time, "delay");
             if (win->timer->split_info[curr]
                 & URN_INFO_BEHIND_TIME) {
-                gtk_style_context_add_class(
-                    gtk_widget_get_style_context(win->time),
-                    "behind");
+                add_class(win->time, "behind");
                 if (win->timer->split_info[curr]
                     & URN_INFO_LOSING_TIME) {
-                    gtk_style_context_add_class(
-                        gtk_widget_get_style_context(win->time),
-                        "losing");
+                    add_class(win->time, "losing");
                 } else {
-                    gtk_style_context_remove_class(
-                        gtk_widget_get_style_context(win->time),
-                        "losing");
+                    remove_class(win->time, "losing");
                 }
             } else {
-                gtk_style_context_remove_class(
-                    gtk_widget_get_style_context(win->time),
-                    "behind");
+                remove_class(win->time, "behind");
                 if (win->timer->split_info[curr]
                     & URN_INFO_LOSING_TIME) {
-                    gtk_style_context_add_class(
-                        gtk_widget_get_style_context(win->time),
-                        "losing");
+                    add_class(win->time, "losing");
                 } else {
-                    gtk_style_context_remove_class(
-                        gtk_widget_get_style_context(win->time),
-                        "losing");
+                    remove_class(win->time, "losing");
                 }
             }
         }
@@ -573,10 +487,33 @@ static gboolean urn_app_window_draw(gpointer data) {
         millis[0] = '.';
         gtk_label_set_text(GTK_LABEL(win->time_seconds), str);
         gtk_label_set_text(GTK_LABEL(win->time_millis), millis);
+
+        // sum of bests
+        if (win->timer->sum_of_bests) {
+            urn_time_string(str, win->timer->sum_of_bests);
+            gtk_label_set_text(GTK_LABEL(win->sum_of_bests), str);
+        }
+
+        // personal best
+        if (win->timer->curr_split == win->game->split_count) {
+            if (win->timer->split_times[win->game->split_count - 1]
+                && !win->game->split_times[win->game->split_count - 1]
+                || (win->timer->split_times[win->game->split_count - 1]
+                    < win->game->split_times[win->game->split_count - 1])) {
+                urn_time_string(
+                    str, win->timer->split_times[win->game->split_count - 1]);
+                gtk_label_set_text(GTK_LABEL(win->personal_best), str);
+            } else if (win->game->split_times[win->game->split_count - 1]) {
+                urn_time_string(
+                    str, win->game->split_times[win->game->split_count - 1]);
+                gtk_label_set_text(GTK_LABEL(win->personal_best), str);
+            }
+        }
+
+
     }
     return TRUE;
 }
-
 
 static void urn_app_window_init(UrnAppWindow *win) {
     GtkWidget *label;
@@ -598,8 +535,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
     g_object_unref(provider);
 
     // Load window junk
-    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(win)),
-                                "window");
+    add_class(GTK_WIDGET(win), "window");
     win->game = 0;
     win->timer = 0;
     
@@ -618,26 +554,24 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_container_add(GTK_CONTAINER(win), win->box);
     
     win->title = gtk_label_new(NULL);
-    gtk_style_context_add_class(
-        gtk_widget_get_style_context(win->title), "title");
+    add_class(win->title, "title");
     gtk_container_add(GTK_CONTAINER(win->box), win->title);
     gtk_widget_show(win->title);
 
     win->split_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    add_class(win->split_box, "splits");
     gtk_widget_set_vexpand(win->split_box, TRUE);
     gtk_widget_set_hexpand(win->split_box, TRUE);
     gtk_container_add(GTK_CONTAINER(win->box), win->split_box);
     gtk_widget_show(win->split_box);
 
     win->time = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_style_context_add_class(
-        gtk_widget_get_style_context(win->time), "timer");
+    add_class(win->time, "timer");
     gtk_container_add(GTK_CONTAINER(win->box), win->time);
     gtk_widget_show(win->time);
 
     win->time_seconds = gtk_label_new(NULL);
-    gtk_style_context_add_class(
-        gtk_widget_get_style_context(win->time), "timer-seconds");
+    add_class(win->time, "timer-seconds");
     gtk_widget_set_hexpand(win->time_seconds, TRUE);
     gtk_widget_set_halign(win->time_seconds, GTK_ALIGN_END);
     gtk_widget_set_valign(win->time_seconds, GTK_ALIGN_BASELINE);
@@ -645,57 +579,55 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_widget_show(win->time_seconds);
 
     win->time_millis = gtk_label_new(NULL);
-    gtk_style_context_add_class(
-        gtk_widget_get_style_context(win->time_millis), "timer-millis");
+    add_class(win->time_millis, "timer-millis");
     gtk_widget_set_halign(win->time_millis, GTK_ALIGN_END);
     gtk_widget_set_valign(win->time_millis, GTK_ALIGN_BASELINE);
     gtk_container_add(GTK_CONTAINER(win->time), win->time_millis);
     gtk_widget_show(win->time_millis);
 
-    win->trailer = gtk_grid_new();
-    gtk_container_add(GTK_CONTAINER(win->box), win->trailer);
-    gtk_widget_show(win->trailer);
+    win->footer = gtk_grid_new();
+    add_class(win->footer, "footer");
+    gtk_container_add(GTK_CONTAINER(win->box), win->footer);
+    gtk_widget_show(win->footer);
 
     win->previous_segment_label =
         gtk_label_new(PREVIOUS_SEGMENT);
     gtk_widget_set_halign(win->previous_segment_label,
                           GTK_ALIGN_START);
     gtk_widget_set_hexpand(win->previous_segment_label, TRUE);
-    gtk_grid_attach(GTK_GRID(win->trailer),
+    gtk_grid_attach(GTK_GRID(win->footer),
                     win->previous_segment_label, 0, 0, 1, 1);
     gtk_widget_show(win->previous_segment_label);
 
     win->previous_segment = gtk_label_new(NULL);
-    gtk_style_context_add_class(
-        gtk_widget_get_style_context(win->previous_segment),
-        "split-delta");
+    add_class(win->previous_segment, "split-delta");
     gtk_widget_set_halign(win->previous_segment, GTK_ALIGN_END);
-    gtk_grid_attach(GTK_GRID(win->trailer),
+    gtk_grid_attach(GTK_GRID(win->footer),
                     win->previous_segment, 1, 0, 1, 1);
     gtk_widget_show(win->previous_segment);
     
     label = gtk_label_new(SUM_OF_BEST_SEGMENTS);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_hexpand(label, TRUE);
-    gtk_grid_attach(GTK_GRID(win->trailer),
+    gtk_grid_attach(GTK_GRID(win->footer),
                     label, 0, 1, 1, 1);
     gtk_widget_show(label);
 
     win->sum_of_bests = gtk_label_new(NULL);
     gtk_widget_set_halign(win->sum_of_bests, GTK_ALIGN_END);
-    gtk_grid_attach(GTK_GRID(win->trailer),
+    gtk_grid_attach(GTK_GRID(win->footer),
                     win->sum_of_bests, 1, 1, 1, 1);
     gtk_widget_show(win->sum_of_bests);
 
     label = gtk_label_new(PERSONAL_BEST);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_hexpand(label, TRUE);
-    gtk_grid_attach(GTK_GRID(win->trailer), label, 0, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(win->footer), label, 0, 2, 1, 1);
     gtk_widget_show(label);
 
     win->personal_best = gtk_label_new(NULL);
     gtk_widget_set_halign(win->personal_best, GTK_ALIGN_END);
-    gtk_grid_attach(GTK_GRID(win->trailer), win->personal_best, 1, 2, 1, 1);
+    gtk_grid_attach(GTK_GRID(win->footer), win->personal_best, 1, 2, 1, 1);
     gtk_widget_show(win->personal_best);
 
     g_timeout_add(1, urn_app_window_step, win);

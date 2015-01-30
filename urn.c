@@ -460,30 +460,32 @@ void urn_timer_step(urn_timer *timer, long long now) {
         timer->time = timer->now - timer->start_time;
         long long time = timer->now - timer->start_time;
         if (timer->curr_split < timer->game->split_count) {
-            // calc split time and delta
             timer->split_times[timer->curr_split] = time;
+            // calc delta
             if (timer->game->split_times[timer->curr_split]) {
                 timer->split_deltas[timer->curr_split] =
                     timer->split_times[timer->curr_split]
                     - timer->game->split_times[timer->curr_split];
-            }
-            // calc segment time and delta
-            timer->segment_times[timer->curr_split] =
-                timer->split_times[timer->curr_split];
-            if (timer->curr_split) {
-                timer->segment_times[timer->curr_split] -=
-                    timer->split_times[timer->curr_split - 1];
-            }
-            if (timer->game->segment_times[timer->curr_split]) {
-                timer->segment_deltas[timer->curr_split] =
-                    timer->segment_times[timer->curr_split]
-                    - timer->game->segment_times[timer->curr_split];
             }
             // check for behind time
             if (timer->split_deltas[timer->curr_split] > 0) {
                 timer->split_info[timer->curr_split] |= URN_INFO_BEHIND_TIME;
             } else {
                 timer->split_info[timer->curr_split] &= ~URN_INFO_BEHIND_TIME;
+            }
+            if (!timer->curr_split || timer->split_times[timer->curr_split - 1]) {
+                // calc segment time and delta
+                timer->segment_times[timer->curr_split] =
+                    timer->split_times[timer->curr_split];
+                if (timer->curr_split) {
+                    timer->segment_times[timer->curr_split] -=
+                        timer->split_times[timer->curr_split - 1];
+                }
+                if (timer->game->segment_times[timer->curr_split]) {
+                    timer->segment_deltas[timer->curr_split] =
+                        timer->segment_times[timer->curr_split]
+                        - timer->game->segment_times[timer->curr_split];
+                }
             }
             // check for losing time
             if (timer->curr_split) {
@@ -540,17 +542,51 @@ int urn_timer_split(urn_timer *timer) {
             // update sum of bests
             timer->sum_of_bests = 0;
             for (i = 0; i < timer->game->split_count; ++i) {
-                if (!timer->best_segments[i]) {
+                if (timer->best_segments[i]) {
+                    timer->sum_of_bests += timer->best_segments[i];
+                } else if (timer->game->best_segments[i]) {
+                    timer->sum_of_bests += timer->game->best_segments[i];
+                } else {
                     timer->sum_of_bests = 0;
                     break;
                 }
-                timer->sum_of_bests += timer->best_segments[i];
             }
             // stop timer if last split
             if (timer->curr_split + 1 == timer->game->split_count) {
                 urn_timer_stop(timer);
             }
             return ++timer->curr_split;
+        }
+    }
+    return 0;
+}
+
+int urn_timer_skip(urn_timer *timer) {
+    if (timer->running) {
+        if (timer->curr_split < timer->game->split_count) {
+            timer->split_times[timer->curr_split] = 0;
+            timer->split_deltas[timer->curr_split] = 0;
+            timer->segment_times[timer->curr_split] = 0;
+            timer->segment_deltas[timer->curr_split] = 0;
+            return ++timer->curr_split;
+        }
+    }
+    return 0;
+}
+
+int urn_timer_unsplit(urn_timer *timer) {
+    if (timer->running) {
+        if (timer->curr_split) {
+            int curr;
+            timer->split_times[timer->curr_split] =
+                timer->game->split_times[timer->curr_split];
+            timer->split_deltas[timer->curr_split] = 0;
+            timer->segment_times[timer->curr_split] =
+                timer->game->segment_times[timer->curr_split];
+            timer->segment_deltas[timer->curr_split] = 0;
+            curr = timer->curr_split;
+            --timer->curr_split;
+            return curr;
         }
     }
     return 0;
@@ -578,11 +614,14 @@ void urn_timer_reset(urn_timer *timer) {
         memset(timer->split_info, 0, size);
         timer->sum_of_bests = 0;
         for (i = 0; i < timer->game->split_count; ++i) {
-            if (!timer->best_segments[i]) {
+            if (timer->best_segments[i]) {
+                timer->sum_of_bests += timer->best_segments[i];
+            } else if (timer->game->best_segments[i]) {
+                timer->sum_of_bests += timer->game->best_segments[i];
+            } else {
                 timer->sum_of_bests = 0;
                 break;
             }
-            timer->sum_of_bests += timer->best_segments[i];
         }
     }
 }

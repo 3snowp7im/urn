@@ -14,6 +14,14 @@ on *nix platforms.
 | Spacebar  | Start timer | Split time |
 | Backspace | Reset timer | Stop timer |
 
+If forgot to split, or accidentally split twice, you can
+manually change the current split:
+
+| Key       | Action      |
+|-----------|-------------|
+| Page Up   | Unsplit     |
+| Page Down | Skip split  |
+
 The color of a time or delta has special meaning.
 
 | Color       | Meaning                                |
@@ -62,6 +70,7 @@ The color of a time or delta has special meaning.
 | .timer         | The current running time    |
 | .timer-millis  | Millis part of running time |
 | .delay         | Negative running time value |
+| .splits        | Split list container        |
 | .current-split | Current split               |
 | .split-title   | Split title string          |
 | .split-time    | Split time                  |
@@ -71,3 +80,4 @@ The color of a time or delta has special meaning.
 | .losing        | Losing time                 |
 | .best-segment  | Best segment time           |
 | .best-split    | Best split time             |
+| .footer        | Window footer               |
