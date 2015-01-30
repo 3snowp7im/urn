@@ -14,7 +14,7 @@ on *nix platforms.
 | Spacebar  | Start timer | Split time |
 | Backspace | Reset timer | Stop timer |
 
-If forgot to split, or accidentally split twice, you can
+If you forgot to split, or accidentally split twice, you can
 manually change the current split:
 
 | Key       | Action      |
