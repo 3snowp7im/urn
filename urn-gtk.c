@@ -125,8 +125,11 @@ static void urn_app_window_destroy(GtkWidget *widget, gpointer data) {
     }
 }
 
-#define PREVIOUS_SEGMENT "Prev segment"
-#define LIVE_SEGMENT "Live segment"
+#define PREVIOUS_SEGMENT      "Previous segment"
+#define LIVE_SEGMENT          "Live segment"
+#define SUM_OF_BEST_SEGMENTS  "Sum of best segments"
+#define PERSONAL_BEST         "Personal best"
+#define WORLD_RECORD          "World record"
 
 static void urn_app_window_clear_game(UrnAppWindow *win) {
     int i;
@@ -373,7 +376,7 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
 
     if (win->game->world_record) {
         char str[64];
-        win->world_record_label = gtk_label_new("World record");
+        win->world_record_label = gtk_label_new(WORLD_RECORD);
         gtk_widget_set_halign(win->world_record_label, GTK_ALIGN_START);
         gtk_widget_set_hexpand(win->world_record_label, TRUE);
         gtk_widget_show(win->world_record_label);
@@ -636,7 +639,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
                     win->previous_segment, 1, 0, 1, 1);
     gtk_widget_show(win->previous_segment);
     
-    label = gtk_label_new("Sum of bests");
+    label = gtk_label_new(SUM_OF_BEST_SEGMENTS);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_hexpand(label, TRUE);
     gtk_grid_attach(GTK_GRID(win->trailer),
@@ -649,7 +652,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
                     win->sum_of_bests, 1, 1, 1, 1);
     gtk_widget_show(win->sum_of_bests);
 
-    label = gtk_label_new("Personal best");
+    label = gtk_label_new(PERSONAL_BEST);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_hexpand(label, TRUE);
     gtk_grid_attach(GTK_GRID(win->trailer), label, 0, 2, 1, 1);
