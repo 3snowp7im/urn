@@ -350,10 +350,6 @@ int urn_game_save(const urn_game *game) {
         json_array_append_new(splits, split);
     }
     json_object_set_new(json, "splits", splits);
-    if (!json_dump_file(json, game->path,
-                        JSON_PRESERVE_ORDER | JSON_INDENT(2))) {
-        error = 1;
-    }
     if (game->style) {
         json_object_set_new(json, "style", json_string(game->style));
     }
@@ -362,6 +358,10 @@ int urn_game_save(const urn_game *game) {
     }
     if (game->height) {
         json_object_set_new(json, "height", json_integer(game->height));
+    }
+    if (!json_dump_file(json, game->path,
+                        JSON_PRESERVE_ORDER | JSON_INDENT(2))) {
+        error = 1;
     }
     json_decref(json);
     return error;

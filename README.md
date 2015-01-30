@@ -60,6 +60,7 @@ The color of a time or delta has special meaning.
 | .window        | The main timer window       |
 | .title         | Title string                |
 | .timer         | The current running time    |
+| .timer-millis  | Millis part of running time |
 | .delay         | Negative running time value |
 | .current-split | Current split               |
 | .split-title   | Split title string          |

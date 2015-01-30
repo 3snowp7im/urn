@@ -812,6 +812,7 @@ static void save_activated(GSimpleAction *action,
         gtk_window_get_size(GTK_WINDOW(win), &width, &height);
         win->game->width = width;
         win->game->height = height;
+        printf("%d %d", width, height);
         urn_game_update_splits(win->game, win->timer);
         urn_game_save(win->game);
     }
