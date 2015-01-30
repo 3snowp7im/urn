@@ -9,6 +9,7 @@
 struct urn_game {
     char *path;
     char *title;
+    char *style;
     long long world_record;
     long long start_delay;
     char **split_titles;

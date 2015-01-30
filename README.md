@@ -3,9 +3,9 @@
 # About
 
 This simple split tracker was hacked together by 3snow p7im.
-It has no frills and is not customizable. It was originally
-written because there were no exisiting solutions for split
-tracking with a delayed start available on *nix platforms.
+It was originally written because there were no exisiting
+solutions for split tracking with a delayed start available
+on *nix platforms.
 
 # Usage
 
@@ -35,17 +35,34 @@ The color of a time or delta has special meaning.
 ## Main object
 
 | Key          | Value                                 |
-| -------------|---------------------------------------|
+|--------------|---------------------------------------|
 | title        | Title string at top of window         |
+| style        | CSS style string                      |
 | start_delay  | Non-negative delay until timer starts |
 | world_record | Best known time                       |
 | splits       | Array of split objects                |
 
 ## Split object
 
-| Key          | Value                                 |
-| -------------|---------------------------------------|
-| title        | Split title                           |
-| time         | Split time                            |
-| best_time    | Your best split time                  |
-| best_segment | Your best segment time                |
+| Key          | Value                  |
+|--------------|------------------------|
+| title        | Split title            |
+| time         | Split time             |
+| best_time    | Your best split time   |
+| best_segment | Your best segment time |
+
+# Styled elements
+
+| Class            | Description                 |
+|------------------|-----------------------------|
+| .window          | The main timer window       |
+| .timer           | The current running time    |
+| .delay           | Negative running time value |
+| .current-segment | Current segment             |
+| .split-time      | Split time                  |
+| .done            | Finished splits             |
+| .split-delta     | Split time delta            |
+| .behind          | Behind time                 |
+| .losing          | Losing time                 |
+| .best-segment    | Best segment time           |
+| .best-split      | Best split time             |
