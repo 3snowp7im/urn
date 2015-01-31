@@ -64,28 +64,37 @@ The color of a time or delta has special meaning.
 
 You can style the window by creating a ```.css``` file
 with the same name as your splits in the same directory.
-I your split file is ```game.json```, the stylesheet
+If your split file is ```game.json```, the stylesheet
 should be named ```game.css```.
 
-| Class          | Description                 |
-|----------------|-----------------------------|
-| .window        | The main timer window       |
-| .title         | Title string                |
-| .timer         | The current running time    |
-| .timer-millis  | Millis part of running time |
-| .delay         | Negative running time value |
-| .splits        | Split list container        |
-| .split         | Split list item             |
-| .current-split | Current split               |
-| .split-title   | Split title string          |
-| .split-time    | Split time                  |
-| .split-delta   | Split time delta            |
-| .done          | Finished splits             |
-| .behind        | Behind time                 |
-| .losing        | Losing time                 |
-| .best-segment  | Best segment time           |
-| .best-split    | Best split time             |
-| .footer        | Window footer               |
+| Class                   |
+|-------------------------|
+| .window                 |
+| .title                  |
+| .timer                  |
+| .timer-millis           |
+| .delta                  |
+| .delay                  |
+| .splits                 |
+| .split                  |
+| .current-split          |
+| .split-title            |
+| .split-time             |
+| .split-delta            | 
+| .done                   |
+| .behind                 |
+| .losing                 |
+| .best-segment           |
+| .best-split             |
+| .footer                 |
+| .previous-segment-label |
+| .previous-segment       |
+| .sum-of-bests-label     |
+| .sum-of-bests           |
+| .personal-best-label    |
+| .personal-best          |
+| .world-record-label     |
+| .world-record           |
 
 If a split has a ```title``` key, its UI element receives a class
 name derived from its title. Specifically, the title is lowercased
