@@ -140,11 +140,13 @@ static void urn_app_window_destroy(GtkWidget *widget, gpointer data) {
 #define WORLD_RECORD          "World record"
 
 static void add_class(GtkWidget *widget, const char *class) {
-    gtk_style_context_add_class(gtk_widget_get_style_context(widget), class);
+    gtk_style_context_add_class(
+        gtk_widget_get_style_context(widget), class);
 }
 
 static void remove_class(GtkWidget *widget, const char *class) {
-    gtk_style_context_remove_class(gtk_widget_get_style_context(widget), class);
+    gtk_style_context_remove_class(
+        gtk_widget_get_style_context(widget), class);
 }
 
 static void urn_app_window_clear_game(UrnAppWindow *win) {
@@ -205,12 +207,10 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
     
     // set dimensions
     if (win->game->width > 0 && win->game->height > 0) {
-        gtk_window_set_default_size(GTK_WINDOW(win),
-                                    win->game->width, win->game->height);
+        gtk_widget_set_size_request(GTK_WIDGET(win),
+                                    win->game->width,
+                                    win->game->height);
     }
-
-    // add game style
-    
 
     // set window css provider
     strcpy(str, win->game->path);
@@ -843,6 +843,7 @@ static void close_activated(GSimpleAction *action,
         urn_game_release(win->game);
         win->game = 0;
     }
+    gtk_widget_set_size_request(GTK_WIDGET(win), -1, -1);
 }
 
 static void quit_activated(GSimpleAction *action,
