@@ -55,7 +55,14 @@ static const char *urn_app_window_style =
     "  color: #999;\n"
     "}\n"
 
+    ".split-title {\n"
+    "  padding-top: 4px;\n"
+    "  padding-bottom: 4px;\n"
+    "}\n"
+
     ".split-time {\n"
+    "  padding-top: 4px;\n"
+    "  padding-bottom: 4px;\n"
     "  color: #FFF;\n"
     "}\n"
 
@@ -88,7 +95,12 @@ static const char *urn_app_window_style =
     "}\n"
 
     ".current-split {\n"
-    "  background-color: #336;\n"
+    "  background: -gtk-gradient(\n"
+    "      linear, 0 0, 0 1,\n"
+    "      color-stop(0, rgba(51, 51, 102, 0.0)),\n"
+    "      color-stop(.25, rgba(51, 51, 102, 1.0)),\n"
+    "      color-stop(.75, rgba(51, 51, 102, 1.0)),\n"
+    "      color-stop(1, rgba(51, 51, 102, 0.0)));\n"
     "}\n"
     ;
 
@@ -246,7 +258,6 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         win->splits[i] = gtk_grid_new();
         add_class(win->splits[i], "split");
         gtk_grid_set_column_homogeneous(GTK_GRID(win->splits[i]), TRUE);
-        gtk_grid_set_row_spacing(GTK_GRID(win->splits[i]), 1);
         gtk_container_add(GTK_CONTAINER(win->split_box), win->splits[i]);
         gtk_widget_show(win->splits[i]);
 
@@ -266,7 +277,7 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
 
         win->split_labels[i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_grid_attach(GTK_GRID(win->splits[i]),
-                        win->split_labels[i], 0, 0, 3, 1);
+                        win->split_labels[i], 0, 0, 4, 1);
         gtk_widget_show(win->split_labels[i]);
 
         win->split_icons[i] = gtk_label_new(NULL);
@@ -286,14 +297,14 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         win->split_deltas[i] = gtk_label_new(NULL);
         add_class(win->split_deltas[i], "split-delta");
         gtk_grid_attach(GTK_GRID(win->splits[i]),
-                        win->split_deltas[i], 3, 0, 1, 1);
+                        win->split_deltas[i], 4, 0, 1, 1);
         gtk_widget_show(win->split_deltas[i]);
         
         win->split_times[i] = gtk_label_new(NULL);
         add_class(win->split_times[i], "split-time");
         gtk_widget_set_halign(win->split_times[i], GTK_ALIGN_END);
         gtk_grid_attach(GTK_GRID(win->splits[i]),
-                        win->split_times[i], 4, 0, 1, 1);
+                        win->split_times[i], 5, 0, 1, 1);
         gtk_widget_show(win->split_times[i]);
         
         if (win->game->split_times[i]) {
