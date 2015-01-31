@@ -29,17 +29,15 @@ typedef struct _UrnAppClass  UrnAppClass;
 typedef struct _UrnAppWindow         UrnAppWindow;
 typedef struct _UrnAppWindowClass    UrnAppWindowClass;
 
-#define WINDOW_WIDTH  (320)
-#define WINDOW_HEIGHT (240)
-
 static const char *urn_app_window_style =
     ".window {\n"
+    "  font-size: 10pt;\n"
     "  background-color: #000;\n"
     "  color: #FFF;\n"
     "}\n"
 
     ".title {\n"
-    "  font-size: 10pt;\n"
+    "  font-size: 12pt;\n"
     "}\n"
 
     ".timer {\n"
@@ -55,14 +53,7 @@ static const char *urn_app_window_style =
     "  color: #999;\n"
     "}\n"
 
-    ".split-title {\n"
-    "  padding-top: 4px;\n"
-    "  padding-bottom: 4px;\n"
-    "}\n"
-
     ".split-time {\n"
-    "  padding-top: 4px;\n"
-    "  padding-bottom: 4px;\n"
     "  color: #FFF;\n"
     "}\n"
 
@@ -95,12 +86,7 @@ static const char *urn_app_window_style =
     "}\n"
 
     ".current-split {\n"
-    "  background: -gtk-gradient(\n"
-    "      linear, 0 0, 0 1,\n"
-    "      color-stop(0, rgba(51, 51, 102, 0.0)),\n"
-    "      color-stop(.25, rgba(51, 51, 102, 1.0)),\n"
-    "      color-stop(.75, rgba(51, 51, 102, 1.0)),\n"
-    "      color-stop(1, rgba(51, 51, 102, 0.0)));\n"
+    "  background-color: rgba(127, 127, 255, 0.3);\n"
     "}\n"
     ;
 
@@ -277,7 +263,7 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
 
         win->split_labels[i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_grid_attach(GTK_GRID(win->splits[i]),
-                        win->split_labels[i], 0, 0, 4, 1);
+                        win->split_labels[i], 0, 0, 3, 1);
         gtk_widget_show(win->split_labels[i]);
 
         win->split_icons[i] = gtk_label_new(NULL);
@@ -297,14 +283,14 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         win->split_deltas[i] = gtk_label_new(NULL);
         add_class(win->split_deltas[i], "split-delta");
         gtk_grid_attach(GTK_GRID(win->splits[i]),
-                        win->split_deltas[i], 4, 0, 1, 1);
+                        win->split_deltas[i], 3, 0, 1, 1);
         gtk_widget_show(win->split_deltas[i]);
         
         win->split_times[i] = gtk_label_new(NULL);
         add_class(win->split_times[i], "split-time");
         gtk_widget_set_halign(win->split_times[i], GTK_ALIGN_END);
         gtk_grid_attach(GTK_GRID(win->splits[i]),
-                        win->split_times[i], 5, 0, 1, 1);
+                        win->split_times[i], 4, 0, 1, 1);
         gtk_widget_show(win->split_times[i]);
         
         if (win->game->split_times[i]) {
@@ -593,8 +579,6 @@ static void urn_app_window_init(UrnAppWindow *win) {
                      G_CALLBACK(urn_app_window_destroy), NULL);
     g_signal_connect(win, "key_press_event",
                      G_CALLBACK(urn_app_window_key), win);
-    gtk_window_set_default_size(GTK_WINDOW(win),
-                                WINDOW_WIDTH, WINDOW_HEIGHT);
     
     win->box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_margin_left(win->box, 8);
