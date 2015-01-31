@@ -77,7 +77,6 @@ should be named ```game.css```.
 | .splits        | Split list container        |
 | .split         | Split list item             |
 | .current-split | Current split               |
-| .split-icon    | Split icon box              |
 | .split-title   | Split title string          |
 | .split-time    | Split time                  |
 | .split-delta   | Split time delta            |
@@ -94,8 +93,3 @@ and all non-alphanumeric characters are replaced with hyphens, and
 the result is concatenated with ```split-```. For instance, if
 your split is titled "First split", it can be styled by targeting
 the CSS class ```.split-first-split```.
-
-Split icon boxes have a default size of 0x0 pixels. If you want
-to give them a ```background``` property, you will need to also
-size the ```.split-icon``` class (giving it a ```padding```
-property works for this).
