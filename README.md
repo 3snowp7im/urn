@@ -71,7 +71,9 @@ The color of a time or delta has special meaning.
 | .timer-millis  | Millis part of running time |
 | .delay         | Negative running time value |
 | .splits        | Split list container        |
+| .split         | Split list item             |
 | .current-split | Current split               |
+| .split-icon    | Split icon box              |
 | .split-title   | Split title string          |
 | .split-time    | Split time                  |
 | .split-delta   | Split time delta            |
@@ -81,3 +83,14 @@ The color of a time or delta has special meaning.
 | .best-segment  | Best segment time           |
 | .best-split    | Best split time             |
 | .footer        | Window footer               |
+
+If a split has a ```title``` key, its UI element receives a class
+name derived from its title. Specifically, the title is lowercased
+and all non-alphanumeric characters are replaced with hyphens. For
+instance, if your split is titled "First split", it can be styled
+by targeting the CSS class ```.first-split```.
+
+Split icon boxes have a default size of 0x0 pixels. If you want
+to give them a ```background``` property, you will need to also
+size the ```.split-icon``` class (giving it a ```padding```
+property works for this).
