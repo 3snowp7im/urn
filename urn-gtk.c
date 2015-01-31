@@ -564,7 +564,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
     
     win->box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_margin_left(win->box, 8);
-    gtk_widget_set_margin_top(win->box, 4);
+    gtk_widget_set_margin_top(win->box, 8);
     gtk_widget_set_margin_right(win->box, 8);
     gtk_widget_set_margin_bottom(win->box, 8);
     gtk_widget_set_vexpand(win->box, TRUE);
