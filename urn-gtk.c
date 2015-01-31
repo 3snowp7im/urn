@@ -251,8 +251,9 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         gtk_widget_show(win->splits[i]);
 
         if (win->game->split_titles[i] && strlen(win->game->split_titles[i])) {
-            char *c = str;
-            strcpy(str, win->game->split_titles[i]);
+            char *c = &str[6];
+            strcpy(str, "split-");
+            strcpy(c, win->game->split_titles[i]);
             do {
                 if (!isalnum(*c)) {
                     *c = '-';

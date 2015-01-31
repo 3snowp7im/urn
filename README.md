@@ -90,9 +90,10 @@ should be named ```game.css```.
 
 If a split has a ```title``` key, its UI element receives a class
 name derived from its title. Specifically, the title is lowercased
-and all non-alphanumeric characters are replaced with hyphens. For
-instance, if your split is titled "First split", it can be styled
-by targeting the CSS class ```.first-split```.
+and all non-alphanumeric characters are replaced with hyphens, and
+the result is concatenated with ```split-```. For instance, if
+your split is titled "First split", it can be styled by targeting
+the CSS class ```.split-first-split```.
 
 Split icon boxes have a default size of 0x0 pixels. If you want
 to give them a ```background``` property, you will need to also
