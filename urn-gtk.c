@@ -399,7 +399,8 @@ static gboolean urn_app_window_draw(gpointer data) {
 
         // splits
         for (i = 0; i < win->split_count; ++i) {
-            if (i == curr && win->timer->start_time) {
+            if (i == win->timer->curr_split
+                && win->timer->start_time) {
                 add_class(win->splits[i], "current-split");
             } else {
                 remove_class(win->splits[i], "current-split");
@@ -411,7 +412,7 @@ static gboolean urn_app_window_draw(gpointer data) {
             }
             
             gtk_label_set_text(GTK_LABEL(win->split_times[i]), "");
-            if (i < curr) {
+            if (i < win->timer->curr_split) {
                 if (win->timer->split_times[i]) {
                     urn_split_string(str, win->timer->split_times[i]);
                     gtk_label_set_text(GTK_LABEL(win->split_times[i]), str);
@@ -426,9 +427,8 @@ static gboolean urn_app_window_draw(gpointer data) {
             remove_class(win->split_deltas[i], "best-segment");
             remove_class(win->split_deltas[i], "behind");
             remove_class(win->split_deltas[i], "losing");
-            if (win->timer->time > 0
-                && (i < curr
-                    || win->timer->split_deltas[i] >= SHOW_DELTA_THRESHOLD)) {
+            if (i < win->timer->curr_split
+                || win->timer->split_deltas[i] >= SHOW_DELTA_THRESHOLD) {
                 if (win->timer->split_info[i] & URN_INFO_BEST_SPLIT) {
                     add_class(win->split_deltas[i], "best-split");
                 } else if (win->timer->split_info[i]
