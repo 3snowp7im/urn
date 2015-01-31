@@ -1,5 +1,5 @@
 OBJS    := urn.o urn-gtk.o
-BIN     := urn
+BIN     := urn-gtk
 CFLAGS  := `pkg-config --cflags gtk+-3.0`
 LDLIBS  := -ljansson `pkg-config --libs gtk+-3.0`
 
