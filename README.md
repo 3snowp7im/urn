@@ -1,4 +1,4 @@
-![Urn](http://i.imgur.com/9rTgllV.png)
+![Urn](http://i.imgur.com/19pQrjP.png)
 
 # About
 

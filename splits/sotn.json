@@ -1,0 +1,33 @@
+{
+  "title": "SotN Any% NSC",
+  "world_record": "17:15.870000",
+  "start_delay": "2.800000",
+  "splits": [
+    {
+      "title": "Mist",
+      "time": "11:43.298775",
+      "best_time": "11:43.298775",
+      "best_segment": "11:43.298775"
+    },
+    {
+      "title": "Bat",
+      "time": "14:32.742367",
+      "best_time": "14:32.742367",
+      "best_segment": "2:49.443592"
+    },
+    {
+      "title": "Reverse",
+      "time": "19:03.337643",
+      "best_time": "19:03.337643",
+      "best_segment": "3:29.179348"
+    },
+    {
+      "title": "Dracula",
+      "time": "26:38.792135",
+      "best_time": "26:38.792135",
+      "best_segment": "7:35.454492"
+    }
+  ],
+  "width": 320,
+  "height": 480
+}
