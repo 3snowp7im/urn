@@ -122,9 +122,6 @@ void urn_game_release(urn_game *game) {
     if (game->title) {
         free(game->title);
     }
-    if (game->style) {
-        free(game->style);
-    }
     if (game->split_titles) {
         for (i = 0; i < game->split_count; ++i) {
             if (game->split_titles[i]) {
@@ -177,15 +174,6 @@ int urn_game_create(urn_game **game_ptr, const char *path) {
     if (ref) {
         game->title = strdup(json_string_value(ref));
         if (!game->title) {
-            error = 1;
-            goto game_create_done;
-        }
-    }
-    // copy style
-    ref = json_object_get(json, "style");
-    if (ref) {
-        game->style = strdup(json_string_value(ref));
-        if (!game->style) {
             error = 1;
             goto game_create_done;
         }
@@ -350,9 +338,6 @@ int urn_game_save(const urn_game *game) {
         json_array_append_new(splits, split);
     }
     json_object_set_new(json, "splits", splits);
-    if (game->style) {
-        json_object_set_new(json, "style", json_string(game->style));
-    }
     if (game->width) {
         json_object_set_new(json, "width", json_integer(game->width));
     }

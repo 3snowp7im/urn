@@ -9,7 +9,6 @@
 struct urn_game {
     char *path;
     char *title;
-    char *style;
     int width;
     int height;
     long long world_record;

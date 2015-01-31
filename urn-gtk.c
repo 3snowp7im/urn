@@ -116,6 +116,7 @@ struct _UrnAppWindow {
     GtkWidget *time;
     GtkWidget *time_seconds;
     GtkWidget *time_millis;
+    GtkCssProvider *style;
 };
 
 struct _UrnAppWindowClass {
@@ -149,6 +150,8 @@ static void remove_class(GtkWidget *widget, const char *class) {
 }
 
 static void urn_app_window_clear_game(UrnAppWindow *win) {
+    GdkDisplay *display;
+    GdkScreen *screen;
     int i;
     gtk_widget_hide(win->box);
     if (win->game->world_record) {
@@ -177,6 +180,13 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     gtk_label_set_text(GTK_LABEL(win->previous_segment), "");
     gtk_label_set_text(GTK_LABEL(win->sum_of_bests), "");
     gtk_label_set_text(GTK_LABEL(win->personal_best), "");
+
+    // remove game's style
+    display = gdk_display_get_default();
+    screen = gdk_display_get_default_screen(display);
+    gtk_style_context_remove_provider_for_screen(
+        screen, GTK_STYLE_PROVIDER(win->style));
+    g_object_unref(win->style);
 }
 
 static gboolean urn_app_window_step(gpointer data) {
@@ -189,48 +199,38 @@ static gboolean urn_app_window_step(gpointer data) {
 }
 
 static void urn_app_window_show_game(UrnAppWindow *win) {
-    char str[256];
-    int i;
-
-    GtkCssProvider *provider;
     GdkDisplay *display;
     GdkScreen *screen;
+    char str[256];
+    char *ptr;
+    int i;
     
-    char *style = 0;
-
     // set dimensions
     if (win->game->width > 0 && win->game->height > 0) {
         gtk_window_set_default_size(GTK_WINDOW(win),
                                     win->game->width, win->game->height);
     }
 
-    // merge css
-    if (win->game->style) {
-        int app_style_len = strlen(urn_app_window_style);
-        style = malloc(strlen(win->game->style) + 1 + app_style_len + 1);
-        strcpy(style, urn_app_window_style);
-        style[app_style_len] = '\n';
-        strcpy(&style[app_style_len + 1], win->game->style);
-    } else {
-        style = strdup(urn_app_window_style);
-    }
+    // add game style
+    
 
     // set window css provider
-    provider = gtk_css_provider_new();
+    strcpy(str, win->game->path);
+    ptr = strrchr(str, '.');
+    if (!ptr) {
+        ptr = &str[strlen(str)];
+    }
+    strcpy(ptr, ".css");
+    win->style = gtk_css_provider_new();
     display = gdk_display_get_default();
     screen = gdk_display_get_default_screen(display);
     gtk_style_context_add_provider_for_screen(
         screen,
-        GTK_STYLE_PROVIDER(provider),
+        GTK_STYLE_PROVIDER(win->style),
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-    gtk_css_provider_load_from_data(
-        GTK_CSS_PROVIDER(provider),
-        style, -1, NULL);
-    g_object_unref(provider);
-
-    if (style) {
-        free(style);
-    }
+    gtk_css_provider_load_from_path(
+        GTK_CSS_PROVIDER(win->style),
+        str, NULL);
 
     gtk_label_set_text(GTK_LABEL(win->title), win->game->title);
 
@@ -581,7 +581,8 @@ static void urn_app_window_init(UrnAppWindow *win) {
                      G_CALLBACK(urn_app_window_destroy), NULL);
     g_signal_connect(win, "key_press_event",
                      G_CALLBACK(urn_app_window_key), win);
-    gtk_window_set_default_size(GTK_WINDOW(win), WINDOW_WIDTH, WINDOW_HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(win),
+                                WINDOW_WIDTH, WINDOW_HEIGHT);
     
     win->box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_margin_left(win->box, 8);

@@ -48,7 +48,6 @@ The color of a time or delta has special meaning.
 | start_delay  | Non-negative delay until timer starts |
 | world_record | Best known time                       |
 | splits       | Array of split objects                |
-| style        | CSS style string                      |
 | width        | Window width                          |
 | height       | Window height                         |
 
@@ -62,6 +61,11 @@ The color of a time or delta has special meaning.
 | best_segment | Your best segment time |
 
 # Styled elements
+
+You can style the window by creating a ```.css``` file
+with the same name as your splits in the same directory.
+I your split file is ```game.json```, the stylesheet
+should be named ```game.css```.
 
 | Class          | Description                 |
 |----------------|-----------------------------|
