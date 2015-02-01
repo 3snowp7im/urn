@@ -709,34 +709,6 @@ struct _UrnAppClass {
 
 G_DEFINE_TYPE(UrnApp, urn_app, GTK_TYPE_APPLICATION);
 
-static void urn_app_init(UrnApp *app) {
-}
-
-static void urn_app_activate(GApplication *app) {
-    UrnAppWindow *win;
-    win = urn_app_window_new(URN_APP(app));
-    gtk_window_present(GTK_WINDOW(win));
-}
-
-static void urn_app_open(GApplication  *app,
-                         GFile        **files,
-                         gint           n_files,
-                         const gchar   *hint) {
-    GList *windows;
-    UrnAppWindow *win;
-    int i;
-    windows = gtk_application_get_windows(GTK_APPLICATION(app));
-    if (windows) {
-        win = URN_APP_WINDOW(windows->data);
-    } else {
-        win = urn_app_window_new(URN_APP(app));
-    }
-    for (i = 0; i < n_files; i++) {
-        urn_window_open(win, g_file_get_path(files[i]));
-    }
-    gtk_window_present(GTK_WINDOW(win));
-}
-
 static void open_activated(GSimpleAction *action,
                            GVariant      *parameter,
                            gpointer       app) {
@@ -865,6 +837,13 @@ static GActionEntry app_entries[] = {
     { "quit", quit_activated, NULL, NULL, NULL }
 };
 
+static void urn_app_activate(GApplication *app) {
+    UrnAppWindow *win;
+    win = urn_app_window_new(URN_APP(app));
+    gtk_window_present(GTK_WINDOW(win));
+    open_activated(NULL, NULL, app);
+}
+
 static void urn_app_startup(GApplication *app) {
     GtkBuilder *builder;
     GMenuModel *menubar;
@@ -910,18 +889,39 @@ static void urn_app_startup(GApplication *app) {
     g_object_unref(builder);
 }
 
-static void urn_app_class_init(UrnAppClass *class) {
-    G_APPLICATION_CLASS(class)->activate = urn_app_activate;
-    G_APPLICATION_CLASS(class)->open = urn_app_open;
-    G_APPLICATION_CLASS(class)->startup = urn_app_startup;
+static void urn_app_init(UrnApp *app) {
 }
 
+static void urn_app_open(GApplication  *app,
+                         GFile        **files,
+                         gint           n_files,
+                         const gchar   *hint) {
+    GList *windows;
+    UrnAppWindow *win;
+    int i;
+    windows = gtk_application_get_windows(GTK_APPLICATION(app));
+    if (windows) {
+        win = URN_APP_WINDOW(windows->data);
+    } else {
+        win = urn_app_window_new(URN_APP(app));
+    }
+    for (i = 0; i < n_files; i++) {
+        urn_window_open(win, g_file_get_path(files[i]));
+    }
+    gtk_window_present(GTK_WINDOW(win));
+}
 UrnApp *urn_app_new(void) {
     g_set_application_name("urn");
     return g_object_new(URN_APP_TYPE,
                         "application-id", "wildmouse.urn",
                         "flags", G_APPLICATION_HANDLES_OPEN,
                         NULL);
+}
+
+static void urn_app_class_init(UrnAppClass *class) {
+    G_APPLICATION_CLASS(class)->activate = urn_app_activate;
+    G_APPLICATION_CLASS(class)->open = urn_app_open;
+    G_APPLICATION_CLASS(class)->startup = urn_app_startup;
 }
 
 int main(int argc, char *argv[]) {
