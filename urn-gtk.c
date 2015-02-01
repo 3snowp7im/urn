@@ -537,6 +537,8 @@ static gboolean urn_app_window_draw(gpointer data) {
 static void urn_app_window_init(UrnAppWindow *win) {
     GtkWidget *label;
 
+    gtk_window_set_decorated(GTK_WINDOW(win), FALSE);
+
     // Load CSS defaults
     GtkCssProvider *provider;
     GdkDisplay *display;
