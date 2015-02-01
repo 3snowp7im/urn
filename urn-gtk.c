@@ -95,6 +95,8 @@ struct _UrnAppWindow {
     urn_game *game;
     urn_timer *timer;
     int split_count;
+    GdkDisplay *display;
+    GdkCursor *cursor;
     GtkWidget *box;
     GtkWidget *title;
     GtkWidget *split_box;
@@ -148,7 +150,6 @@ static void remove_class(GtkWidget *widget, const char *class) {
 }
 
 static void urn_app_window_clear_game(UrnAppWindow *win) {
-    GdkDisplay *display;
     GdkScreen *screen;
     int i;
     gtk_widget_hide(win->box);
@@ -178,8 +179,7 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     gtk_label_set_text(GTK_LABEL(win->personal_best), "");
 
     // remove game's style
-    display = gdk_display_get_default();
-    screen = gdk_display_get_default_screen(display);
+    screen = gdk_display_get_default_screen(win->display);
     gtk_style_context_remove_provider_for_screen(
         screen, GTK_STYLE_PROVIDER(win->style));
     g_object_unref(win->style);
@@ -188,6 +188,14 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
 static gboolean urn_app_window_step(gpointer data) {
     UrnAppWindow *win = data;
     long long now = urn_time_now();
+    static int set_cursor;
+    if (!set_cursor) {
+        GdkWindow *gdk_window = gtk_widget_get_window(GTK_WIDGET(win));
+        if (gdk_window) {
+            gdk_window_set_cursor(gdk_window, win->cursor);
+            set_cursor = 1;
+        }
+    }
     if (win->timer) {
         urn_timer_step(win->timer, now);
     }
@@ -195,7 +203,6 @@ static gboolean urn_app_window_step(gpointer data) {
 }
 
 static void urn_app_window_show_game(UrnAppWindow *win) {
-    GdkDisplay *display;
     GdkScreen *screen;
     char str[256];
     char *ptr;
@@ -216,8 +223,7 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
     }
     strcpy(ptr, ".css");
     win->style = gtk_css_provider_new();
-    display = gdk_display_get_default();
-    screen = gdk_display_get_default_screen(display);
+    screen = gdk_display_get_default_screen(win->display);
     gtk_style_context_add_provider_for_screen(
         screen,
         GTK_STYLE_PROVIDER(win->style),
@@ -536,16 +542,19 @@ static gboolean urn_app_window_draw(gpointer data) {
 
 static void urn_app_window_init(UrnAppWindow *win) {
     GtkWidget *label;
-
+    GdkRGBA color;
+    GdkPixbuf *pix;
+    
+    win->display = gdk_display_get_default();
+    
+    // no winodw border
     gtk_window_set_decorated(GTK_WINDOW(win), FALSE);
 
     // Load CSS defaults
     GtkCssProvider *provider;
-    GdkDisplay *display;
     GdkScreen *screen;
     provider = gtk_css_provider_new();
-    display = gdk_display_get_default();
-    screen = gdk_display_get_default_screen(display);
+    screen = gdk_display_get_default_screen(win->display);
     gtk_style_context_add_provider_for_screen(
         screen,
         GTK_STYLE_PROVIDER(provider),
@@ -657,6 +666,11 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     g_timeout_add(1, urn_app_window_step, win);
     g_timeout_add((int)(1000 / 60.), urn_app_window_draw, win); 
+
+    // create blank cursor
+    gdk_rgba_parse(&color, "rgba(0, 0, 0, 0)");
+    pix = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 1, 1);
+    win->cursor = gdk_cursor_new_from_pixbuf(win->display, pix, 0, 0);
 }
 
 static void urn_app_window_class_init(UrnAppWindowClass *class) {
