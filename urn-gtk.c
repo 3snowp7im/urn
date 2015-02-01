@@ -96,7 +96,6 @@ struct _UrnAppWindow {
     urn_timer *timer;
     int split_count;
     GdkDisplay *display;
-    GdkCursor *cursor;
     GtkWidget *box;
     GtkWidget *title;
     GtkWidget *split_box;
@@ -192,7 +191,8 @@ static gboolean urn_app_window_step(gpointer data) {
     if (!set_cursor) {
         GdkWindow *gdk_window = gtk_widget_get_window(GTK_WIDGET(win));
         if (gdk_window) {
-            gdk_window_set_cursor(gdk_window, win->cursor);
+            GdkCursor* cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
+            gdk_window_set_cursor(gdk_window, cursor);
             set_cursor = 1;
         }
     }
@@ -666,11 +666,6 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     g_timeout_add(1, urn_app_window_step, win);
     g_timeout_add((int)(1000 / 60.), urn_app_window_draw, win); 
-
-    // create blank cursor
-    gdk_rgba_parse(&color, "rgba(0, 0, 0, 0)");
-    pix = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 1, 1);
-    win->cursor = gdk_cursor_new_from_pixbuf(win->display, pix, 0, 0);
 }
 
 static void urn_app_window_class_init(UrnAppWindowClass *class) {
