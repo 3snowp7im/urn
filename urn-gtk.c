@@ -31,22 +31,25 @@ typedef struct _UrnAppWindowClass    UrnAppWindowClass;
 
 static const char *urn_app_window_style =
     ".window {\n"
-    "  font-size: 10pt;\n"
     "  background-color: #000;\n"
     "  color: #FFF;\n"
     "}\n"
 
     ".title {\n"
-    "  font-size: 12pt;\n"
+    "  font-size: large;\n"
     "}\n"
 
+    ".attempt-count {\n"
+    "  color: #666;\n"
+    "}"
+
     ".timer {\n"
-    "  font-size: 24pt;\n"
+    "  font-size: 300%;\n"
     "  text-shadow: 2px 2px #666;\n"
     "}\n"
 
     ".timer-millis {\n"
-    "  font-size: 20pt;\n"
+    "  font-size: 75%;\n"
     "}\n"
 
     ".split-time {\n"
@@ -92,12 +95,15 @@ static const char *urn_app_window_style =
 
 struct _UrnAppWindow {
     GtkApplicationWindow parent;
+    int decorated;
     urn_game *game;
     urn_timer *timer;
     int split_count;
     GdkDisplay *display;
     GtkWidget *box;
+    GtkWidget *header;
     GtkWidget *title;
+    GtkWidget *attempt_count;
     GtkWidget **splits;
     GtkWidget *split_box;
     GtkAdjustment *split_adjust;
@@ -149,6 +155,16 @@ static void add_class(GtkWidget *widget, const char *class) {
 static void remove_class(GtkWidget *widget, const char *class) {
     gtk_style_context_remove_class(
         gtk_widget_get_style_context(widget), class);
+}
+
+static gpointer save_game_thread(gpointer data) {
+    urn_game *game = data;
+    urn_game_save(game);
+    return NULL;
+}
+
+static void save_game(urn_game *game) {
+    g_thread_new("save_game", save_game_thread, game);
 }
 
 static void urn_app_window_clear_game(UrnAppWindow *win) {
@@ -236,6 +252,9 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         str, NULL);
 
     gtk_label_set_text(GTK_LABEL(win->title), win->game->title);
+
+    sprintf(str, "#%d", win->game->attempt_count);
+    gtk_label_set_text(GTK_LABEL(win->attempt_count), str);
 
     win->split_count = win->game->split_count;
     win->splits = calloc(win->split_count, sizeof(GtkWidget *));
@@ -361,6 +380,28 @@ static void urn_app_window_scroll(UrnAppWindow *win) {
     }
 }
 
+#define WINDOW_PAD (8)
+
+static void resize_window(UrnAppWindow *win, int window_width, int window_height) {
+    GdkRectangle rect;
+    int attempt_count_width;
+    int title_width;
+    gtk_widget_hide(win->title);
+    gtk_widget_get_allocation(win->attempt_count, &rect);
+    attempt_count_width = rect.width;
+    title_width = window_width - 2 * WINDOW_PAD - attempt_count_width;
+    gtk_widget_set_size_request(win->title, title_width, -1);
+    gtk_widget_show(win->title);
+}
+
+static gboolean urn_app_window_resize(GtkWidget *widget,
+                                      GdkEvent *event,
+                                      gpointer data) {
+    UrnAppWindow *win = (UrnAppWindow*)widget;
+    resize_window(win, event->configure.width, event->configure.height);
+    return FALSE;
+}
+
 static gboolean urn_app_window_key(GtkWidget *widget,
                                    GdkEventKey *event,
                                    gpointer data) {
@@ -369,12 +410,13 @@ static gboolean urn_app_window_key(GtkWidget *widget,
     case GDK_KEY_space:
         if (win->timer) {
             if (!win->timer->running) {
-                urn_timer_start(win->timer);
-                urn_app_window_scroll(win);
+                if (urn_timer_start(win->timer)) {
+                    save_game(win->game);
+                }
             } else {
                 urn_timer_split(win->timer);
-                urn_app_window_scroll(win);
             }
+            urn_app_window_scroll(win);
         }
         break;
     case GDK_KEY_BackSpace:
@@ -382,10 +424,20 @@ static gboolean urn_app_window_key(GtkWidget *widget,
             if (win->timer->running) {
                 urn_timer_stop(win->timer);
             } else {
-                urn_timer_reset(win->timer);
+                if (urn_timer_reset(win->timer)) {
+                    urn_app_window_clear_game(win);
+                    urn_app_window_show_game(win);
+                    save_game(win->game);
+                }
+            }
+        }
+        break;
+    case GDK_KEY_Delete:
+        if (win->timer) {
+            if (urn_timer_cancel(win->timer)) {
                 urn_app_window_clear_game(win);
                 urn_app_window_show_game(win);
-                urn_app_window_scroll(win);
+                save_game(win->game);
             }
         }
         break;
@@ -400,6 +452,10 @@ static gboolean urn_app_window_key(GtkWidget *widget,
             urn_timer_unsplit(win->timer);
             urn_app_window_scroll(win);
         }
+        break;
+    case GDK_KEY_Control_R:
+        gtk_window_set_decorated(GTK_WINDOW(win), !win->decorated);
+        win->decorated = !win->decorated;
         break;
     }
     return TRUE;
@@ -421,6 +477,9 @@ static gboolean urn_app_window_draw(gpointer data) {
         if (curr == win->game->split_count) {
             --curr;
         }
+
+        sprintf(str, "#%d", win->game->attempt_count);
+        gtk_label_set_text(GTK_LABEL(win->attempt_count), str);
 
         // splits
         for (i = 0; i < win->split_count; ++i) {
@@ -521,7 +580,7 @@ static gboolean urn_app_window_draw(gpointer data) {
         if (curr == win->game->split_count) {
             curr = win->game->split_count - 1;
         }
-        if (win->timer->time < 0) {
+        if (win->timer->time <= 0) {
             add_class(win->time, "delay");
         } else {
             remove_class(win->time, "delay");
@@ -572,7 +631,7 @@ static gboolean urn_app_window_draw(gpointer data) {
             gtk_label_set_text(GTK_LABEL(win->personal_best), str);
         }
 
-
+        //resize_window(win);
     }
     return TRUE;
 }
@@ -585,6 +644,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
     win->display = gdk_display_get_default();
     
     // no winodw border
+    win->decorated = 0;
     gtk_window_set_decorated(GTK_WINDOW(win), FALSE);
 
     // Load CSS defaults
@@ -610,19 +670,32 @@ static void urn_app_window_init(UrnAppWindow *win) {
                      G_CALLBACK(urn_app_window_destroy), NULL);
     g_signal_connect(win, "key_press_event",
                      G_CALLBACK(urn_app_window_key), win);
+    g_signal_connect(win, "configure-event",
+                     G_CALLBACK(urn_app_window_resize), win);
     
     win->box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_widget_set_margin_top(win->box, 8);
-    gtk_widget_set_margin_bottom(win->box, 8);
+    gtk_widget_set_margin_top(win->box, WINDOW_PAD);
+    gtk_widget_set_margin_bottom(win->box, WINDOW_PAD);
     gtk_widget_set_vexpand(win->box, TRUE);
     gtk_container_add(GTK_CONTAINER(win), win->box);
+
+    win->header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    add_class(win->header, "header");
+    gtk_widget_set_margin_left(win->header, WINDOW_PAD);
+    gtk_widget_set_margin_right(win->header, WINDOW_PAD);
+    gtk_container_add(GTK_CONTAINER(win->box), win->header);
+    gtk_widget_show(win->header);
     
     win->title = gtk_label_new(NULL);
     add_class(win->title, "title");
-    gtk_widget_set_margin_left(win->title, 8);
-    gtk_widget_set_margin_right(win->title, 8);
-    gtk_container_add(GTK_CONTAINER(win->box), win->title);
-    gtk_widget_show(win->title);
+    gtk_label_set_line_wrap(GTK_LABEL(win->title), TRUE);
+    gtk_widget_set_hexpand(win->title, TRUE);
+    gtk_container_add(GTK_CONTAINER(win->header), win->title);
+
+    win->attempt_count = gtk_label_new(NULL);
+    add_class(win->attempt_count, "attempt-count");
+    gtk_container_add(GTK_CONTAINER(win->header), win->attempt_count);
+    gtk_widget_show(win->attempt_count);
 
     win->split_adjust = gtk_adjustment_new(0., 0., 0., 0., 0., 0.);
 
@@ -642,8 +715,8 @@ static void urn_app_window_init(UrnAppWindow *win) {
         &color);
     
     win->split_viewport = gtk_viewport_new(NULL, NULL);
-    gtk_widget_set_margin_left(win->split_viewport, 8);
-    gtk_widget_set_margin_right(win->split_viewport, 8);
+    gtk_widget_set_margin_left(win->split_viewport, WINDOW_PAD);
+    gtk_widget_set_margin_right(win->split_viewport, WINDOW_PAD);
     gtk_container_add(GTK_CONTAINER(win->split_scroller), win->split_viewport);
     gtk_widget_show(win->split_viewport);
 
@@ -654,8 +727,8 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->time = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     add_class(win->time, "timer");
-    gtk_widget_set_margin_left(win->time, 8);
-    gtk_widget_set_margin_right(win->time, 8);
+    gtk_widget_set_margin_left(win->time, WINDOW_PAD);
+    gtk_widget_set_margin_right(win->time, WINDOW_PAD);
     gtk_container_add(GTK_CONTAINER(win->box), win->time);
     gtk_widget_show(win->time);
 
@@ -676,8 +749,8 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->footer = gtk_grid_new();
     add_class(win->footer, "footer");
-    gtk_widget_set_margin_left(win->footer, 8);
-    gtk_widget_set_margin_right(win->footer, 8);
+    gtk_widget_set_margin_left(win->footer, WINDOW_PAD);
+    gtk_widget_set_margin_right(win->footer, WINDOW_PAD);
     gtk_container_add(GTK_CONTAINER(win->box), win->footer);
     gtk_widget_show(win->footer);
 
@@ -737,7 +810,7 @@ static UrnAppWindow *urn_app_window_new(UrnApp *app) {
     return g_object_new(URN_APP_WINDOW_TYPE, "application", app, NULL);
 }
 
-static void urn_window_open(UrnAppWindow *win, const char *file) {
+static void urn_app_window_open(UrnAppWindow *win, const char *file) {
     if (win->timer) {
         urn_app_window_clear_game(win);
         urn_timer_release(win->timer);
@@ -790,7 +863,7 @@ static void open_activated(GSimpleAction *action,
         char *filename;
         GtkFileChooser *chooser = GTK_FILE_CHOOSER(dialog);
         filename = gtk_file_chooser_get_filename(chooser);
-        urn_window_open(win, filename);
+        urn_app_window_open(win, filename);
         g_free(filename);
     }
     gtk_widget_destroy(dialog);
@@ -813,7 +886,7 @@ static void save_activated(GSimpleAction *action,
         win->game->width = width;
         win->game->height = height;
         urn_game_update_splits(win->game, win->timer);
-        urn_game_save(win->game);
+        save_game(win->game);
     }
 }
 
@@ -830,7 +903,7 @@ static void save_bests_activated(GSimpleAction *action,
     }
     if (win->game && win->timer) {
         urn_game_update_bests(win->game, win->timer);
-        urn_game_save(win->game);
+        save_game(win->game);
     }
 }
 
@@ -848,7 +921,7 @@ static void reload_activated(GSimpleAction *action,
     }
     if (win->game) {
         path = strdup(win->game->path);
-        urn_window_open(win, path);
+        urn_app_window_open(win, path);
         free(path);
     }
 }
@@ -962,10 +1035,11 @@ static void urn_app_open(GApplication  *app,
         win = urn_app_window_new(URN_APP(app));
     }
     for (i = 0; i < n_files; i++) {
-        urn_window_open(win, g_file_get_path(files[i]));
+        urn_app_window_open(win, g_file_get_path(files[i]));
     }
     gtk_window_present(GTK_WINDOW(win));
 }
+
 UrnApp *urn_app_new(void) {
     g_set_application_name("urn");
     return g_object_new(URN_APP_TYPE,

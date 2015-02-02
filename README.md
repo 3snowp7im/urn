@@ -9,10 +9,13 @@ on *nix platforms.
 
 # Usage
 
-| Key       | Stopped     | Started    |
-|-----------|-------------|------------|
-| Spacebar  | Start timer | Split time |
-| Backspace | Reset timer | Stop timer |
+| Key        | Stopped     | Started    |
+|------------|-------------|------------|
+| Spacebar   | Start timer | Split time |
+| Backspace  | Reset timer | Stop timer |
+| Delete     | Cancel run* | -          |
+
+(*) resets the timer and decrements the attempt counter.
 
 If you forgot to split, or accidentally split twice, you can
 manually change the current split:
@@ -32,6 +35,9 @@ The color of a time or delta has special meaning.
 | Light green | Ahead of splits in PB and losing time  |
 | Blue        | Best split time in any run             |
 | Gold        | Best segment time in any run           |
+
+Initially the window is undecorated. You can toggle window decorations
+by pressing the right Control key.
 
 # File format
 
@@ -70,7 +76,9 @@ should be named ```game.css```.
 | Class                   |
 |-------------------------|
 | .window                 |
+| .header                 |
 | .title                  |
+| .attempt-count          |
 | .timer                  |
 | .timer-millis           |
 | .delta                  |

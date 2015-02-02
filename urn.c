@@ -178,6 +178,11 @@ int urn_game_create(urn_game **game_ptr, const char *path) {
             goto game_create_done;
         }
     }
+    // get attempt count
+    ref = json_object_get(json, "attempt_count");
+    if (ref) {
+        game->attempt_count = json_integer_value(ref);
+    }
     // get width
     ref = json_object_get(json, "width");
     if (ref) {
@@ -291,7 +296,12 @@ int urn_game_create(urn_game **game_ptr, const char *path) {
 void urn_game_update_splits(urn_game *game,
                             const urn_timer *timer) {
     if (timer->curr_split) {
-        int size = timer->curr_split * sizeof(long long);
+        int curr, size;
+        curr = timer->curr_split;
+        if (timer->curr_split > game->split_count) {
+            curr = game->split_count - 1;
+        }
+        size = timer->curr_split * sizeof(long long);
         memcpy(game->split_times, timer->split_times, size);
         memcpy(game->segment_times, timer->segment_times, size);
         memcpy(game->best_splits, timer->best_splits, size);
@@ -302,7 +312,12 @@ void urn_game_update_splits(urn_game *game,
 void urn_game_update_bests(urn_game *game,
                            const urn_timer *timer) {
     if (timer->curr_split) {
-        int size = timer->curr_split * sizeof(long long);
+        int curr, size;
+        curr = timer->curr_split;
+        if (timer->curr_split > game->split_count) {
+            curr = game->split_count - 1;
+        }
+        size = timer->curr_split * sizeof(long long);
         memcpy(game->best_splits, timer->best_splits, size);
         memcpy(game->best_segments, timer->best_segments, size);
     }
@@ -316,6 +331,9 @@ int urn_game_save(const urn_game *game) {
     int i;
     if (game->title) {
         json_object_set_new(json, "title", json_string(game->title));
+    }
+    if (game->attempt_count) {
+        json_object_set_new(json, "attempt_count", json_integer(game->attempt_count));
     }
     if (game->world_record) {
         urn_time_string_serialized(str, game->world_record);
@@ -376,7 +394,36 @@ void urn_timer_release(urn_timer *timer) {
     }
 }
 
-int urn_timer_create(urn_timer **timer_ptr, const urn_game *game) {
+static void reset_timer(urn_timer *timer) {
+    int i;
+    int size;
+    timer->started = 0;
+    timer->start_time = 0;
+    timer->curr_split = 0;
+    timer->time = -timer->game->start_delay;
+    size = timer->game->split_count * sizeof(long long);
+    memcpy(timer->split_times, timer->game->split_times, size);
+    memset(timer->split_deltas, 0, size);
+    memcpy(timer->segment_times, timer->game->segment_times, size);
+    memset(timer->segment_deltas, 0, size);
+    memcpy(timer->best_splits, timer->game->best_splits, size);
+    memcpy(timer->best_segments, timer->game->best_segments, size);
+    size = timer->game->split_count * sizeof(int);
+    memset(timer->split_info, 0, size);
+    timer->sum_of_bests = 0;
+    for (i = 0; i < timer->game->split_count; ++i) {
+        if (timer->best_segments[i]) {
+            timer->sum_of_bests += timer->best_segments[i];
+        } else if (timer->game->best_segments[i]) {
+            timer->sum_of_bests += timer->game->best_segments[i];
+        } else {
+            timer->sum_of_bests = 0;
+            break;
+        }
+    }
+}
+
+int urn_timer_create(urn_timer **timer_ptr, urn_game *game) {
     int error = 0;
     urn_timer *timer;
     // allocate timer
@@ -386,6 +433,7 @@ int urn_timer_create(urn_timer **timer_ptr, const urn_game *game) {
         goto timer_create_done;
     }
     timer->game = game;
+    timer->attempt_count = &game->attempt_count;
     // alloc splits
     timer->split_times = calloc(timer->game->split_count,
                                 sizeof(long long));
@@ -429,7 +477,7 @@ int urn_timer_create(urn_timer **timer_ptr, const urn_game *game) {
         error = 1;
         goto timer_create_done;
     }
-    urn_timer_reset(timer);
+    reset_timer(timer);
  timer_create_done:
     if (!error) {
         *timer_ptr = timer;
@@ -497,6 +545,8 @@ int urn_timer_start(urn_timer *timer) {
     if (timer->curr_split < timer->game->split_count) {
         if (!timer->start_time) {
             timer->start_time = timer->now + timer->game->start_delay;
+            ++*timer->attempt_count;
+            timer->started = 1;
         }
         timer->running = 1;
     }
@@ -581,32 +631,28 @@ void urn_timer_stop(urn_timer *timer) {
     timer->running = 0;
 }
 
-void urn_timer_reset(urn_timer *timer) {
+int urn_timer_reset(urn_timer *timer) {
     if (!timer->running) {
-        int i;
-        int size;
-        timer->start_time = 0;
-        timer->curr_split = 0;
-        timer->time = -timer->game->start_delay;
-        size = timer->game->split_count * sizeof(long long);
-        memcpy(timer->split_times, timer->game->split_times, size);
-        memset(timer->split_deltas, 0, size);
-        memcpy(timer->segment_times, timer->game->segment_times, size);
-        memset(timer->segment_deltas, 0, size);
-        memcpy(timer->best_splits, timer->game->best_splits, size);
-        memcpy(timer->best_segments, timer->game->best_segments, size);
-        size = timer->game->split_count * sizeof(int);
-        memset(timer->split_info, 0, size);
-        timer->sum_of_bests = 0;
-        for (i = 0; i < timer->game->split_count; ++i) {
-            if (timer->best_segments[i]) {
-                timer->sum_of_bests += timer->best_segments[i];
-            } else if (timer->game->best_segments[i]) {
-                timer->sum_of_bests += timer->game->best_segments[i];
+        if (timer->started && timer->time <= 0) {
+            return urn_timer_cancel(timer);
+        }
+        reset_timer(timer);
+        return 1;
+    }
+    return 0;
+}
+
+int urn_timer_cancel(urn_timer *timer) {
+    if (!timer->running) {
+        if (timer->started) {
+            if (*timer->attempt_count <= 0) {
+                *timer->attempt_count = 0;
             } else {
-                timer->sum_of_bests = 0;
-                break;
+                --*timer->attempt_count;
             }
         }
+        reset_timer(timer);
+        return 1;
     }
+    return 0;
 }

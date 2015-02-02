@@ -9,6 +9,7 @@
 struct urn_game {
     char *path;
     char *title;
+    int attempt_count;
     int width;
     int height;
     long long world_record;
@@ -23,6 +24,7 @@ struct urn_game {
 typedef struct urn_game urn_game;
 
 struct urn_timer {
+    int started;
     int running;
     long long now;
     long long start_time;
@@ -37,6 +39,7 @@ struct urn_timer {
     long long *best_splits;
     long long *best_segments;
     const urn_game *game;
+  int *attempt_count;
 };
 typedef struct urn_timer urn_timer;
 
@@ -62,7 +65,7 @@ int urn_game_save(const urn_game *game);
 
 void urn_game_release(urn_game *game);
 
-int urn_timer_create(urn_timer **timer_ptr, const urn_game *game);
+int urn_timer_create(urn_timer **timer_ptr, urn_game *game);
 
 void urn_timer_release(urn_timer *timer);
 
@@ -78,6 +81,8 @@ int urn_timer_unsplit(urn_timer *timer);
 
 void urn_timer_stop(urn_timer *timer);
 
-void urn_timer_reset(urn_timer *timer);
+int urn_timer_reset(urn_timer *timer);
+
+int urn_timer_cancel(urn_timer *timer);
 
 #endif
