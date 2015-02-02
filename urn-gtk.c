@@ -338,7 +338,7 @@ static void urn_app_window_scroll(UrnAppWindow *win) {
     int split_h;
     int scroller_h;
     double curr_scroll;
-    double scroll;
+    double min_scroll, max_scroll;
     int curr = win->timer->curr_split;
     if (curr == win->split_count) {
         --curr;
@@ -352,8 +352,13 @@ static void urn_app_window_scroll(UrnAppWindow *win) {
     split_h = rect.height;
     gtk_widget_get_allocation(win->split_scroller, &rect);
     scroller_h = rect.height;
-    scroll = split_y + curr_scroll - scroller_h + split_h;
-    gtk_adjustment_set_value(win->split_adjust, scroll);
+    min_scroll = split_y + curr_scroll - scroller_h + split_h;
+    max_scroll = split_y + curr_scroll;
+    if (curr_scroll > max_scroll) {
+        gtk_adjustment_set_value(win->split_adjust, max_scroll);
+    } else if (curr_scroll < min_scroll) {
+        gtk_adjustment_set_value(win->split_adjust, min_scroll);
+    }
 }
 
 static gboolean urn_app_window_key(GtkWidget *widget,
