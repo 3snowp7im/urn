@@ -41,12 +41,12 @@ static const char *urn_app_window_style =
     "}\n"
 
     ".timer {\n"
-    "  font-size: 32pt;\n"
-    "  text-shadow: 3px 3px #666;\n"
+    "  font-size: 24pt;\n"
+    "  text-shadow: 2px 2px #666;\n"
     "}\n"
 
     ".timer-millis {\n"
-    "  font-size: 24pt;\n"
+    "  font-size: 20pt;\n"
     "}\n"
 
     ".split-time {\n"
@@ -397,8 +397,8 @@ static gboolean urn_app_window_draw(gpointer data) {
             remove_class(win->split_times[i], "done");
             gtk_label_set_text(GTK_LABEL(win->split_times[i]), "-");
             if (i < win->timer->curr_split) {
+                add_class(win->split_times[i], "done");
                 if (win->timer->split_times[i]) {
-                    add_class(win->split_times[i], "done");
                     urn_split_string(str, win->timer->split_times[i]);
                     gtk_label_set_text(GTK_LABEL(win->split_times[i]), str);
                 }
