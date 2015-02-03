@@ -80,11 +80,11 @@ static const char *urn_app_window_style =
     "  color: #999;\n"
     "}\n"
 
-    ".delta.best-segment {\n"
+    ".best-segment {\n"
     "  color: #F90;\n"
     "}\n"
 
-    ".delta.best-split {\n"
+    ".best-split {\n"
     "  color: #99F;\n"
     "}\n"
 
@@ -565,29 +565,28 @@ static gboolean urn_app_window_draw(gpointer data) {
         gtk_label_set_text(GTK_LABEL(win->previous_segment_label), label);
 
         // running time
+        remove_class(win->time, "delay");
+        remove_class(win->time, "behind");
+        remove_class(win->time, "losing");
+        remove_class(win->time, "best-split");
         if (curr == win->game->split_count) {
             curr = win->game->split_count - 1;
         }
         if (win->timer->time <= 0) {
             add_class(win->time, "delay");
         } else {
-            remove_class(win->time, "delay");
-            if (win->timer->split_info[curr]
-                & URN_INFO_BEHIND_TIME) {
-                add_class(win->time, "behind");
+            if (win->timer->curr_split == win->split_count
+                && win->timer->split_info[curr]
+                   & URN_INFO_BEST_SPLIT) {
+                add_class(win->time, "best-split");
+            } else{
                 if (win->timer->split_info[curr]
-                    & URN_INFO_LOSING_TIME) {
-                    add_class(win->time, "losing");
-                } else {
-                    remove_class(win->time, "losing");
+                    & URN_INFO_BEHIND_TIME) {
+                    add_class(win->time, "behind");
                 }
-            } else {
-                remove_class(win->time, "behind");
                 if (win->timer->split_info[curr]
                     & URN_INFO_LOSING_TIME) {
                     add_class(win->time, "losing");
-                } else {
-                    remove_class(win->time, "losing");
                 }
             }
         }
@@ -806,7 +805,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
                     win->world_record, 1, 3, 1, 1);
 
     g_timeout_add(1, urn_app_window_step, win);
-    g_timeout_add((int)(1000 / 60.), urn_app_window_draw, win); 
+    g_timeout_add((int)(1000 / 30.), urn_app_window_draw, win); 
 }
 
 static void urn_app_window_class_init(UrnAppWindowClass *class) {
