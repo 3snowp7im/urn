@@ -9,21 +9,28 @@ on *nix platforms.
 
 # Usage
 
-| Key        | Stopped     | Started    |
-|------------|-------------|------------|
-| Spacebar   | Start timer | Split time |
-| Backspace  | Reset timer | Stop timer |
-| Delete     | Cancel run* | -          |
+Initially the window is undecorated. You can toggle window decorations
+by pressing right ```Control```.
 
-(*) resets the timer and decrements the attempt counter.
+The timer is controlled by key presses:
 
-If you forgot to split, or accidentally split twice, you can
-manually change the current split:
+| Key        | Stopped | Started    |
+|------------|---------|------------|
+| Spacebar   | Start   | Split time |
+| Backspace  | Reset   | Stop timer |
+| Delete     | Cancel  | -          |
+
+Cancel will reset the timer and decrement the attempt counter.
+A run that is reset before the start delay is automatically
+cancelled. If you forgot to split, or accidentally split twice,
+you can manually change the current split:
 
 | Key       | Action      |
 |-----------|-------------|
 | Page Up   | Unsplit     |
 | Page Down | Skip split  |
+
+# Color Key
 
 The color of a time or delta has special meaning.
 
@@ -35,9 +42,6 @@ The color of a time or delta has special meaning.
 | Light green | Ahead of splits in PB and losing time  |
 | Blue        | Best split time in any run             |
 | Gold        | Best segment time in any run           |
-
-Initially the window is undecorated. You can toggle window decorations
-by pressing the right Control key.
 
 # File format
 

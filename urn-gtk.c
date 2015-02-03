@@ -40,7 +40,7 @@ static const char *urn_app_window_style =
     "}\n"
 
     ".attempt-count {\n"
-    "  color: #666;\n"
+    "  color: #999;\n"
     "}"
 
     ".timer {\n"
@@ -172,12 +172,8 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     int i;
     gtk_widget_hide(win->box);
     if (win->game->world_record) {
-        gtk_container_remove(GTK_CONTAINER(win->footer),
-                             win->world_record_label);
-        gtk_container_remove(GTK_CONTAINER(win->footer),
-                             win->world_record);
-        win->world_record_label = 0;
-        win->world_record = 0;
+        gtk_widget_hide(win->world_record_label);
+        gtk_widget_hide(win->world_record);
     }
     for (i = 0; i < win->split_count; ++i) {
         gtk_container_remove(GTK_CONTAINER(win->split_box),
@@ -332,20 +328,11 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
 
     if (win->game->world_record) {
         char str[256];
-        win->world_record_label = gtk_label_new(WORLD_RECORD);
-        add_class(win->world_record_label, "world-record-label");
         gtk_widget_set_halign(win->world_record_label, GTK_ALIGN_START);
         gtk_widget_set_hexpand(win->world_record_label, TRUE);
-        gtk_widget_show(win->world_record_label);
-        win->world_record = gtk_label_new(NULL);
-        add_class(win->world_record, "world-record");
-        gtk_widget_set_halign(win->world_record, GTK_ALIGN_END);
         urn_time_string(str, win->game->world_record);
         gtk_label_set_text(GTK_LABEL(win->world_record), str);
-        gtk_grid_attach(GTK_GRID(win->footer),
-                        win->world_record_label, 0, 3, 1, 1);
-        gtk_grid_attach(GTK_GRID(win->footer),
-                        win->world_record, 1, 3, 1, 1);
+        gtk_widget_show(win->world_record_label);
         gtk_widget_show(win->world_record);
     }
     gtk_widget_show(win->box);
@@ -390,8 +377,10 @@ static void resize_window(UrnAppWindow *win, int window_width, int window_height
     gtk_widget_get_allocation(win->attempt_count, &rect);
     attempt_count_width = rect.width;
     title_width = window_width - 2 * WINDOW_PAD - attempt_count_width;
-    gtk_widget_set_size_request(win->title, title_width, -1);
+    rect.width = title_width;
+    rect.height = -1;
     gtk_widget_show(win->title);
+    gtk_widget_set_allocation(win->title, &rect);
 }
 
 static gboolean urn_app_window_resize(GtkWidget *widget,
@@ -688,12 +677,15 @@ static void urn_app_window_init(UrnAppWindow *win) {
     
     win->title = gtk_label_new(NULL);
     add_class(win->title, "title");
+    gtk_label_set_justify(GTK_LABEL(win->title), GTK_JUSTIFY_CENTER);
     gtk_label_set_line_wrap(GTK_LABEL(win->title), TRUE);
     gtk_widget_set_hexpand(win->title, TRUE);
     gtk_container_add(GTK_CONTAINER(win->header), win->title);
 
     win->attempt_count = gtk_label_new(NULL);
     add_class(win->attempt_count, "attempt-count");
+    gtk_widget_set_margin_left(win->attempt_count, WINDOW_PAD);
+    gtk_widget_set_valign(win->attempt_count, GTK_ALIGN_START);
     gtk_container_add(GTK_CONTAINER(win->header), win->attempt_count);
     gtk_widget_show(win->attempt_count);
 
@@ -766,6 +758,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->previous_segment = gtk_label_new(NULL);
     add_class(win->previous_segment, "prev-segment");
+    gtk_widget_set_margin_left(win->previous_segment, WINDOW_PAD);
     gtk_widget_set_halign(win->previous_segment, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer),
                     win->previous_segment, 1, 0, 1, 1);
@@ -781,6 +774,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->sum_of_bests = gtk_label_new(NULL);
     add_class(win->sum_of_bests, "sum-of-bests");
+    gtk_widget_set_margin_left(win->sum_of_bests, WINDOW_PAD);
     gtk_widget_set_halign(win->sum_of_bests, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer),
                     win->sum_of_bests, 1, 1, 1, 1);
@@ -795,9 +789,22 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->personal_best = gtk_label_new(NULL);
     add_class(label, "personal-best");
+    gtk_widget_set_margin_left(win->personal_best, WINDOW_PAD);
     gtk_widget_set_halign(win->personal_best, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer), win->personal_best, 1, 2, 1, 1);
     gtk_widget_show(win->personal_best);
+
+    win->world_record_label = gtk_label_new(WORLD_RECORD);
+    add_class(win->world_record_label, "world-record-label");
+    gtk_grid_attach(GTK_GRID(win->footer),
+                    win->world_record_label, 0, 3, 1, 1);
+    
+    win->world_record = gtk_label_new(NULL);
+    add_class(win->world_record, "world-record");
+    gtk_widget_set_margin_left(win->world_record, WINDOW_PAD);
+    gtk_widget_set_halign(win->world_record, GTK_ALIGN_END);
+    gtk_grid_attach(GTK_GRID(win->footer),
+                    win->world_record, 1, 3, 1, 1);
 
     g_timeout_add(1, urn_app_window_step, win);
     g_timeout_add((int)(1000 / 60.), urn_app_window_draw, win); 
