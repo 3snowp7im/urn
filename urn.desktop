@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Urn
+Exec=/usr/local/bin/urn-gtk
+Icon=urn
+Type=Application
+Categories=GTK;GNOME;Utility;
