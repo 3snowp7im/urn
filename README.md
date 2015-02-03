@@ -14,11 +14,11 @@ by pressing right ```Control```.
 
 The timer is controlled by key presses:
 
-| Key        | Stopped | Started    |
-|------------|---------|------------|
-| Spacebar   | Start   | Split time |
-| Backspace  | Reset   | Stop timer |
-| Delete     | Cancel  | -          |
+| Key        | Stopped | Started |
+|------------|---------|---------|
+| Spacebar   | Start   | Split   |
+| Backspace  | Reset   | Stop    |
+| Delete     | Cancel  | -       |
 
 Cancel will reset the timer and decrement the attempt counter.
 A run that is reset before the start delay is automatically
