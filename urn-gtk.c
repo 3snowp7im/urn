@@ -171,10 +171,9 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     GdkScreen *screen;
     int i;
     gtk_widget_hide(win->box);
-    if (win->game->world_record) {
-        gtk_widget_hide(win->world_record_label);
-        gtk_widget_hide(win->world_record);
-    }
+    gtk_widget_hide(win->split_box);
+    gtk_widget_hide(win->world_record_label);
+    gtk_widget_hide(win->world_record);
     for (i = 0; i < win->split_count; ++i) {
         gtk_container_remove(GTK_CONTAINER(win->split_box),
                              win->splits[i]);
@@ -336,6 +335,7 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         gtk_widget_show(win->world_record);
     }
     gtk_widget_show(win->box);
+    gtk_widget_show(win->split_box);
 }
 
 static void urn_app_window_scroll(UrnAppWindow *win) {
@@ -378,7 +378,6 @@ static void resize_window(UrnAppWindow *win, int window_width, int window_height
     attempt_count_width = rect.width;
     title_width = window_width - 2 * WINDOW_PAD - attempt_count_width;
     rect.width = title_width;
-    rect.height = -1;
     gtk_widget_show(win->title);
     gtk_widget_set_allocation(win->title, &rect);
 }
