@@ -2,11 +2,6 @@
     background-repeat: no-repeat;
 }
 
-.timer {
-    font-family: LiquidCrystal;
-    text-shadow: none;
-}
-
 .split-title {
     padding-left: 24px;
 }

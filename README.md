@@ -70,12 +70,14 @@ The color of a time or delta has special meaning.
 | best_time    | Your best split time   |
 | best_segment | Your best segment time |
 
-# Styled elements
+# Styling
 
 You can style the window by creating a ```.css``` file
 with the same name as your splits in the same directory.
 If your split file is ```game.json```, the stylesheet
 should be named ```game.css```.
+
+Global style will be applied from ```~/.urn/style.css```.
 
 | Class                   |
 |-------------------------|

@@ -1,6 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 #include <gtk/gtk.h>
 #include "urn.h"
 
@@ -704,6 +707,11 @@ static void urn_app_window_init(UrnAppWindow *win) {
     GtkWidget *label;
     GdkRGBA color;
     GdkPixbuf *pix;
+    struct passwd *pw = getpwuid(getuid());
+    const char *homedir = pw->pw_dir;
+    char user_style_path[256];
+    strcpy(user_style_path, homedir);
+    strcat(user_style_path, "/.urn/style.css");
     
     win->display = gdk_display_get_default();
     
@@ -723,6 +731,18 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_css_provider_load_from_data(
         GTK_CSS_PROVIDER(provider),
         urn_app_window_style, -1, NULL);
+    g_object_unref(provider);
+
+    // Load user CSS defaults
+    provider = gtk_css_provider_new();
+    screen = gdk_display_get_default_screen(win->display);
+    gtk_style_context_add_provider_for_screen(
+        screen,
+        GTK_STYLE_PROVIDER(provider),
+        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    gtk_css_provider_load_from_path(
+        GTK_CSS_PROVIDER(provider),
+        user_style_path, NULL);
     g_object_unref(provider);
 
     // Load window junk
