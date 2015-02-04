@@ -705,6 +705,7 @@ static gboolean urn_app_window_draw(gpointer data) {
 
 static void urn_app_window_init(UrnAppWindow *win) {
     GtkWidget *label;
+    GtkWidget *spacer;
     GdkRGBA color;
     GdkPixbuf *pix;
     struct passwd *pw = getpwuid(getuid());
@@ -827,19 +828,26 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_container_add(GTK_CONTAINER(win->box), win->time);
     gtk_widget_show(win->time);
 
+    spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_widget_set_hexpand(spacer, TRUE);
+    gtk_container_add(GTK_CONTAINER(win->time), spacer);
+    gtk_widget_show(spacer);
+
     win->time_seconds = gtk_label_new(NULL);
-    add_class(win->time, "timer-seconds");
-    gtk_widget_set_hexpand(win->time_seconds, TRUE);
-    gtk_widget_set_halign(win->time_seconds, GTK_ALIGN_END);
+    add_class(win->time_seconds, "timer-seconds");
     gtk_widget_set_valign(win->time_seconds, GTK_ALIGN_BASELINE);
     gtk_container_add(GTK_CONTAINER(win->time), win->time_seconds);
     gtk_widget_show(win->time_seconds);
 
+    spacer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_valign(spacer, GTK_ALIGN_END);
+    gtk_container_add(GTK_CONTAINER(win->time), spacer);
+    gtk_widget_show(spacer);
+
     win->time_millis = gtk_label_new(NULL);
     add_class(win->time_millis, "timer-millis");
-    gtk_widget_set_halign(win->time_millis, GTK_ALIGN_END);
     gtk_widget_set_valign(win->time_millis, GTK_ALIGN_BASELINE);
-    gtk_container_add(GTK_CONTAINER(win->time), win->time_millis);
+    gtk_container_add(GTK_CONTAINER(spacer), win->time_millis);
     gtk_widget_show(win->time_millis);
 
     win->footer = gtk_grid_new();
