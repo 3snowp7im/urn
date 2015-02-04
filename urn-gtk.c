@@ -91,6 +91,10 @@ static const char *urn_app_window_style =
     ".current-split {\n"
     "  background-color: rgba(127, 127, 255, 0.3);\n"
     "}\n"
+
+    ".split-last {\n"
+    "  border-top: 1px #FFF solid;\n"
+    "}\n"
     ;
 
 struct _UrnAppWindow {
@@ -106,6 +110,7 @@ struct _UrnAppWindow {
     GtkWidget *attempt_count;
     GtkWidget **splits;
     GtkWidget *split_box;
+    GtkWidget *split_last;
     GtkAdjustment *split_adjust;
     GtkWidget *split_scroller;
     GtkWidget *split_viewport;
@@ -172,12 +177,15 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     int i;
     gtk_widget_hide(win->box);
     gtk_widget_hide(win->split_box);
+    gtk_widget_hide(win->split_last);
     gtk_widget_hide(win->world_record_label);
     gtk_widget_hide(win->world_record);
     for (i = 0; i < win->split_count; ++i) {
-        gtk_container_remove(GTK_CONTAINER(win->split_box),
-                             win->splits[i]);
+        gtk_container_remove(
+            GTK_CONTAINER(gtk_widget_get_parent(win->splits[i])),
+            win->splits[i]);
     }
+    gtk_adjustment_set_value(win->split_adjust, 0);
     free(win->splits);
     free(win->split_titles);
     free(win->split_deltas);
@@ -214,6 +222,46 @@ static gboolean urn_app_window_step(gpointer data) {
         urn_timer_step(win->timer, now);
     }
     return TRUE;
+}
+
+static void urn_app_window_split_trailer(UrnAppWindow *win) {
+    if (win->timer) {
+        GdkRectangle rect;
+        GtkWidget *last = win->splits[win->split_count - 1];
+        double curr_scroll = gtk_adjustment_get_value(win->split_adjust);
+        double scroll_max = gtk_adjustment_get_upper(win->split_adjust);
+        double page_size = gtk_adjustment_get_page_size(win->split_adjust);
+        int split_h;
+        g_object_ref(last);
+        gtk_widget_get_allocation(last, &rect);
+        split_h = rect.height;
+        gtk_widget_get_allocation(win->split_box, &rect);
+        if (gtk_widget_get_parent(last) == win->split_box) {
+            if (curr_scroll + page_size < scroll_max) {
+                // move last split to split_last
+                add_class(win->split_last, "split-last");
+                gtk_container_remove(GTK_CONTAINER(win->split_box), last);
+                gtk_container_add(GTK_CONTAINER(win->split_last), last);
+                gtk_adjustment_set_upper(win->split_adjust,
+                                         scroll_max - split_h);
+                gtk_widget_show(win->split_last);
+            }
+        } else {
+            if (curr_scroll + page_size == scroll_max) {
+                // move last split to split box
+                remove_class(win->split_last, "split-last");
+                gtk_container_remove(GTK_CONTAINER(win->split_last), last);
+                gtk_container_add(GTK_CONTAINER(win->split_box), last);
+                gtk_adjustment_set_upper(win->split_adjust,
+                                         scroll_max + rect.height);
+                gtk_adjustment_set_value(win->split_adjust,
+                                         curr_scroll + split_h);
+                gtk_widget_hide(win->split_last);
+            }
+        }
+        gtk_widget_set_hexpand(last, TRUE);
+        g_object_unref(last);
+    }
 }
 
 static void urn_app_window_show_game(UrnAppWindow *win) {
@@ -265,8 +313,8 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         gtk_widget_show(win->splits[i]);
 
         if (win->game->split_titles[i] && strlen(win->game->split_titles[i])) {
-            char *c = &str[6];
-            strcpy(str, "split-");
+            char *c = &str[12];
+            strcpy(str, "split-title-");
             strcpy(c, win->game->split_titles[i]);
             do {
                 if (!isalnum(*c)) {
@@ -336,26 +384,44 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
     }
     gtk_widget_show(win->box);
     gtk_widget_show(win->split_box);
+
+    urn_app_window_split_trailer(win);
 }
 
-static void urn_app_window_scroll(UrnAppWindow *win) {
+static void urn_app_window_scroll_to_split(UrnAppWindow *win) {
     GdkRectangle rect;
     int split_x, split_y;
     int split_h;
     int scroller_h;
     double curr_scroll;
     double min_scroll, max_scroll;
+    int prev = win->timer->curr_split - 1;
     int curr = win->timer->curr_split;
-    if (curr == win->split_count) {
-        --curr;
+    int next = win->timer->curr_split + 1;
+    if (prev < 0) {
+        prev = 0;
+    }
+    if (curr >= win->split_count) {
+        curr = win->split_count - 1;
+    }
+    if (next >= win->split_count) {
+        next = win->split_count - 1;
     }
     curr_scroll = gtk_adjustment_get_value(win->split_adjust);
     gtk_widget_translate_coordinates(
-        win->splits[curr],
+        win->splits[prev],
         win->split_viewport,
         0, 0, &split_x, &split_y);
-    gtk_widget_get_allocation(win->splits[curr], &rect);
+    gtk_widget_get_allocation(win->splits[prev], &rect);
     split_h = rect.height;
+    if (curr != next && curr != prev) {
+        gtk_widget_get_allocation(win->splits[curr], &rect);
+        split_h += rect.height;
+    }
+    if (prev != next) {
+        gtk_widget_get_allocation(win->splits[next], &rect);
+        split_h += rect.height;
+    }
     gtk_widget_get_allocation(win->split_scroller, &rect);
     scroller_h = rect.height;
     min_scroll = split_y + curr_scroll - scroller_h + split_h;
@@ -367,9 +433,19 @@ static void urn_app_window_scroll(UrnAppWindow *win) {
     }
 }
 
+static gboolean urn_app_window_scrolled(GtkWidget *widget,
+                                        GdkEvent *event,
+                                        gpointer data) {
+    UrnAppWindow *win = data;
+    urn_app_window_split_trailer(win);
+    return FALSE;
+}
+
 #define WINDOW_PAD (8)
 
-static void resize_window(UrnAppWindow *win, int window_width, int window_height) {
+static void resize_window(UrnAppWindow *win,
+                          int window_width,
+                          int window_height) {
     GdkRectangle rect;
     int attempt_count_width;
     int title_width;
@@ -404,7 +480,7 @@ static gboolean urn_app_window_key(GtkWidget *widget,
             } else {
                 urn_timer_split(win->timer);
             }
-            urn_app_window_scroll(win);
+            urn_app_window_scroll_to_split(win);
         }
         break;
     case GDK_KEY_BackSpace:
@@ -432,13 +508,13 @@ static gboolean urn_app_window_key(GtkWidget *widget,
     case GDK_KEY_Page_Down:
         if (win->timer) {
             urn_timer_skip(win->timer);
-            urn_app_window_scroll(win);
+            urn_app_window_scroll_to_split(win);
         }
         break;
     case GDK_KEY_Page_Up:
         if (win->timer) {
             urn_timer_unsplit(win->timer);
-            urn_app_window_scroll(win);
+            urn_app_window_scroll_to_split(win);
         }
         break;
     case GDK_KEY_Control_R:
@@ -619,6 +695,7 @@ static gboolean urn_app_window_draw(gpointer data) {
         }
 
         //resize_window(win);
+        urn_app_window_split_trailer(win);
     }
     return TRUE;
 }
@@ -694,6 +771,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_widget_set_hexpand(win->split_scroller, TRUE);
     gtk_container_add(GTK_CONTAINER(win->box), win->split_scroller);
     gtk_widget_show(win->split_scroller);
+    gtk_widget_add_events(win->split_scroller, GDK_SCROLL_MASK);
 
     // hide split scrollbar
     gdk_rgba_parse(&color, "rgba(0,0,0,0)");
@@ -714,6 +792,13 @@ static void urn_app_window_init(UrnAppWindow *win) {
     add_class(win->split_box, "splits");
     gtk_container_add(GTK_CONTAINER(win->split_viewport), win->split_box);
     gtk_widget_show(win->split_box);
+    
+    win->split_last = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_widget_set_margin_left(win->split_last, WINDOW_PAD);
+    gtk_widget_set_margin_right(win->split_last, WINDOW_PAD);
+    gtk_widget_set_hexpand(win->split_last, TRUE);
+    gtk_container_add(GTK_CONTAINER(win->box), win->split_last);
+    gtk_widget_show(win->split_last);
 
     win->time = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     add_class(win->time, "timer");

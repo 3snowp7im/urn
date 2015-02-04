@@ -93,6 +93,7 @@ should be named ```game.css```.
 | .split-title            |
 | .split-time             |
 | .split-delta            | 
+| .split-last             |
 | .done                   |
 | .behind                 |
 | .losing                 |
@@ -111,6 +112,6 @@ should be named ```game.css```.
 If a split has a ```title``` key, its UI element receives a class
 name derived from its title. Specifically, the title is lowercased
 and all non-alphanumeric characters are replaced with hyphens, and
-the result is concatenated with ```split-```. For instance, if
-your split is titled "First split", it can be styled by targeting
-the CSS class ```.split-first-split```.
+the result is concatenated with ```split-title-```. For instance,
+if your split is titled "First split", it can be styled by
+targeting the CSS class ```.split-title-first-split```.

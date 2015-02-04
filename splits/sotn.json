@@ -1,33 +1,33 @@
 {
   "title": "SotN Any% NSC",
-  "world_record": "17:15.870000",
+  "attempt_count": 17,
   "start_delay": "2.800000",
   "splits": [
     {
       "title": "Mist",
-      "time": "11:43.298775",
-      "best_time": "11:43.298775",
-      "best_segment": "11:43.298775"
+      "time": "11:46.100236",
+      "best_time": "11:37.547380",
+      "best_segment": "11:37.547380"
     },
     {
       "title": "Bat",
-      "time": "14:32.742367",
-      "best_time": "14:32.742367",
-      "best_segment": "2:49.443592"
+      "time": "14:27.366766",
+      "best_time": "14:16.933388",
+      "best_segment": "2:39.386008"
     },
     {
       "title": "Reverse",
-      "time": "19:03.337643",
-      "best_time": "19:03.337643",
-      "best_segment": "3:29.179348"
+      "time": "18:03.065931",
+      "best_time": "17:34.104057",
+      "best_segment": "3:17.170669"
     },
     {
       "title": "Dracula",
-      "time": "26:38.792135",
-      "best_time": "26:38.792135",
-      "best_segment": "7:35.454492"
+      "time": "24:03.560151",
+      "best_time": "24:03.560151",
+      "best_segment": "5:54.446978"
     }
   ],
   "width": 320,
-  "height": 480
+  "height": 240
 }

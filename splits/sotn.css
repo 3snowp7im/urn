@@ -1,35 +1,34 @@
-.window {
-    background-image: url('img/sotn.png');
-    background-size: 390px 560px;
-    background-position: 50% 100%
-}
-
 .split {
     background-repeat: no-repeat;
+}
+
+.timer {
+    font-family: LiquidCrystal;
+    text-shadow: none;
 }
 
 .split-title {
     padding-left: 24px;
 }
 
-.split-mist {
+.split-title-mist {
     background-image: url('img/mist.png');
     background-size: 15px 11px;
     background-position: 2px 50%;
 }
 
-.split-bat {
+.split-title-bat {
     background-image: url('img/bat.png');
     background-size: 16px 11px;
     background-position: 0 6px;
 }
 
-.split-reverse {
+.split-title-reverse {
     background-image: url('img/glasses.png');
     background-position: 3px 50%;
 }
 
-.split-dracula {
+.split-title-dracula {
     background-image: url('img/star.png');
     background-position: 2px 50%;
 }
