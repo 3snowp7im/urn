@@ -46,8 +46,13 @@ static const char *urn_app_window_style =
     "  color: #999;\n"
     "}"
 
+    ".time, .delta {\n"
+    "  font-weight: bold;\n"
+    "}\n"
+
     ".timer {\n"
     "  font-size: 300%;\n"
+    "  font-weight: normal;\n"
     "  text-shadow: 2px 2px #666;\n"
     "}\n"
 
@@ -61,10 +66,6 @@ static const char *urn_app_window_style =
 
     ".done {\n"
     "  color: #999;\n"
-    "}\n"
-
-    ".time, .delta {\n"
-    "  font-weight: bold;\n"
     "}\n"
 
     ".timer, .delta {\n"
