@@ -242,7 +242,7 @@ static void urn_app_window_split_trailer(UrnAppWindow *win) {
         if (gtk_widget_get_parent(last) == win->split_box) {
             if (curr_scroll + page_size < scroll_max) {
                 // move last split to split_last
-                add_class(win->split_last, "split-last");
+                add_class(last, "split-last");
                 gtk_container_remove(GTK_CONTAINER(win->split_box), last);
                 gtk_container_add(GTK_CONTAINER(win->split_last), last);
                 gtk_adjustment_set_upper(win->split_adjust,
@@ -252,7 +252,7 @@ static void urn_app_window_split_trailer(UrnAppWindow *win) {
         } else {
             if (curr_scroll + page_size == scroll_max) {
                 // move last split to split box
-                remove_class(win->split_last, "split-last");
+                remove_class(last, "split-last");
                 gtk_container_remove(GTK_CONTAINER(win->split_last), last);
                 gtk_container_add(GTK_CONTAINER(win->split_box), last);
                 gtk_adjustment_set_upper(win->split_adjust,
