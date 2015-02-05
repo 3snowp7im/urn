@@ -274,6 +274,7 @@ static void urn_app_window_split_trailer(UrnAppWindow *win) {
 
 static void urn_app_window_show_game(UrnAppWindow *win) {
     GdkScreen *screen;
+    GError *error = NULL;
     char str[256];
     char *ptr;
     int i;
@@ -300,7 +301,8 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     gtk_css_provider_load_from_path(
         GTK_CSS_PROVIDER(win->style),
-        str, NULL);
+        str, &error);
+    g_clear_error(&error);
 
     gtk_label_set_text(GTK_LABEL(win->title), win->game->title);
 
@@ -718,6 +720,9 @@ static gboolean urn_app_window_draw(gpointer data) {
 }
 
 static void urn_app_window_init(UrnAppWindow *win) {
+    GtkCssProvider *provider;
+    GdkScreen *screen;
+    GError *error = NULL;
     GtkWidget *label;
     GtkWidget *spacer;
     GdkRGBA color;
@@ -735,8 +740,6 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_window_set_decorated(GTK_WINDOW(win), FALSE);
 
     // Load CSS defaults
-    GtkCssProvider *provider;
-    GdkScreen *screen;
     provider = gtk_css_provider_new();
     screen = gdk_display_get_default_screen(win->display);
     gtk_style_context_add_provider_for_screen(
@@ -745,8 +748,9 @@ static void urn_app_window_init(UrnAppWindow *win) {
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     gtk_css_provider_load_from_data(
         GTK_CSS_PROVIDER(provider),
-        urn_app_window_style, -1, NULL);
+        urn_app_window_style, -1, &error);
     g_object_unref(provider);
+    g_clear_error(&error);
 
     // Load user CSS defaults
     provider = gtk_css_provider_new();
@@ -757,8 +761,9 @@ static void urn_app_window_init(UrnAppWindow *win) {
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     gtk_css_provider_load_from_path(
         GTK_CSS_PROVIDER(provider),
-        user_style_path, NULL);
+        user_style_path, &error);
     g_object_unref(provider);
+    g_clear_error(&error);
 
     // Load window junk
     add_class(GTK_WIDGET(win), "window");
