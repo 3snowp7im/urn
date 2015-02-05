@@ -63,6 +63,10 @@ static const char *urn_app_window_style =
     "  color: #999;\n"
     "}\n"
 
+    ".time, .delta {\n"
+    "  font-weight: bold;\n"
+    "}\n"
+
     ".timer, .delta {\n"
     "  color: #0C0;\n"
     "}\n"
@@ -337,7 +341,6 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
         gtk_widget_show(win->split_titles[i]);
         
         win->split_deltas[i] = gtk_label_new(NULL);
-        add_class(win->split_deltas[i], "delta");
         add_class(win->split_deltas[i], "split-delta");
         gtk_grid_attach(GTK_GRID(win->splits[i]),
                         win->split_deltas[i], 3, 0, 1, 1);
@@ -557,24 +560,28 @@ static gboolean urn_app_window_draw(gpointer data) {
                 remove_class(win->splits[i], "current-split");
             }
             
+            remove_class(win->split_times[i], "time");
             remove_class(win->split_times[i], "done");
             gtk_label_set_text(GTK_LABEL(win->split_times[i]), "-");
             if (i < win->timer->curr_split) {
                 add_class(win->split_times[i], "done");
                 if (win->timer->split_times[i]) {
+                    add_class(win->split_times[i], "time");
                     urn_split_string(str, win->timer->split_times[i]);
                     gtk_label_set_text(GTK_LABEL(win->split_times[i]), str);
                 }
             } else if (win->game->split_times[i]) {
+                add_class(win->split_times[i], "time");
                 urn_split_string(str, win->game->split_times[i]);
                 gtk_label_set_text(GTK_LABEL(win->split_times[i]), str);
             }
             
-            gtk_label_set_text(GTK_LABEL(win->split_deltas[i]), "");
             remove_class(win->split_deltas[i], "best-split");
             remove_class(win->split_deltas[i], "best-segment");
             remove_class(win->split_deltas[i], "behind");
             remove_class(win->split_deltas[i], "losing");
+            remove_class(win->split_deltas[i], "delta");
+            gtk_label_set_text(GTK_LABEL(win->split_deltas[i]), "");
             if (i < win->timer->curr_split
                 || win->timer->split_deltas[i] >= SHOW_DELTA_THRESHOLD) {
                 if (win->timer->split_info[i] & URN_INFO_BEST_SPLIT) {
@@ -597,6 +604,7 @@ static gboolean urn_app_window_draw(gpointer data) {
                     }
                 }
                 if (win->timer->split_deltas[i]) {
+                    add_class(win->split_deltas[i], "delta");
                     urn_delta_string(str, win->timer->split_deltas[i]);
                     gtk_label_set_text(GTK_LABEL(win->split_deltas[i]), str);
                 }
@@ -675,23 +683,28 @@ static gboolean urn_app_window_draw(gpointer data) {
         gtk_label_set_text(GTK_LABEL(win->time_millis), millis);
 
         // sum of bests
+        remove_class(win->sum_of_bests, "time");
         gtk_label_set_text(GTK_LABEL(win->sum_of_bests), "-");
         if (win->timer->sum_of_bests) {
+            add_class(win->sum_of_bests, "time");
             urn_time_string(str, win->timer->sum_of_bests);
             gtk_label_set_text(GTK_LABEL(win->sum_of_bests), str);
         }
 
         // personal best
+        remove_class(win->personal_best, "time");
         gtk_label_set_text(GTK_LABEL(win->personal_best), "-");
         if (win->timer->curr_split == win->game->split_count
             && win->timer->split_times[win->game->split_count - 1]
             && (!win->game->split_times[win->game->split_count - 1]
                 || (win->timer->split_times[win->game->split_count - 1]
                     < win->game->split_times[win->game->split_count - 1]))) {
+            add_class(win->personal_best, "time");
             urn_time_string(
                 str, win->timer->split_times[win->game->split_count - 1]);
             gtk_label_set_text(GTK_LABEL(win->personal_best), str);
         } else if (win->game->split_times[win->game->split_count - 1]) {
+            add_class(win->personal_best, "time");
             urn_time_string(
                 str, win->game->split_times[win->game->split_count - 1]);
             gtk_label_set_text(GTK_LABEL(win->personal_best), str);
@@ -870,7 +883,6 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->previous_segment = gtk_label_new(NULL);
     add_class(win->previous_segment, "prev-segment");
-    add_class(win->previous_segment, "delta");
     gtk_widget_set_margin_left(win->previous_segment, WINDOW_PAD);
     gtk_widget_set_halign(win->previous_segment, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer),
@@ -887,7 +899,6 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->sum_of_bests = gtk_label_new(NULL);
     add_class(win->sum_of_bests, "sum-of-bests");
-    add_class(win->sum_of_bests, "time");
     gtk_widget_set_margin_left(win->sum_of_bests, WINDOW_PAD);
     gtk_widget_set_halign(win->sum_of_bests, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer),
@@ -903,7 +914,6 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->personal_best = gtk_label_new(NULL);
     add_class(win->personal_best, "personal-best");
-    add_class(win->personal_best, "time");
     gtk_widget_set_margin_left(win->personal_best, WINDOW_PAD);
     gtk_widget_set_halign(win->personal_best, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer), win->personal_best, 1, 2, 1, 1);
