@@ -823,6 +823,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->time = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     add_class(win->time, "timer");
+    add_class(win->time, "time");
     gtk_widget_set_margin_left(win->time, WINDOW_PAD);
     gtk_widget_set_margin_right(win->time, WINDOW_PAD);
     gtk_container_add(GTK_CONTAINER(win->box), win->time);
@@ -869,6 +870,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->previous_segment = gtk_label_new(NULL);
     add_class(win->previous_segment, "prev-segment");
+    add_class(win->previous_segment, "delta");
     gtk_widget_set_margin_left(win->previous_segment, WINDOW_PAD);
     gtk_widget_set_halign(win->previous_segment, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer),
@@ -885,6 +887,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->sum_of_bests = gtk_label_new(NULL);
     add_class(win->sum_of_bests, "sum-of-bests");
+    add_class(win->sum_of_bests, "time");
     gtk_widget_set_margin_left(win->sum_of_bests, WINDOW_PAD);
     gtk_widget_set_halign(win->sum_of_bests, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer),
@@ -899,7 +902,8 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_widget_show(label);
 
     win->personal_best = gtk_label_new(NULL);
-    add_class(label, "personal-best");
+    add_class(win->personal_best, "personal-best");
+    add_class(win->personal_best, "time");
     gtk_widget_set_margin_left(win->personal_best, WINDOW_PAD);
     gtk_widget_set_halign(win->personal_best, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer), win->personal_best, 1, 2, 1, 1);
@@ -912,6 +916,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
     
     win->world_record = gtk_label_new(NULL);
     add_class(win->world_record, "world-record");
+    add_class(win->world_record, "time");
     gtk_widget_set_margin_left(win->world_record, WINDOW_PAD);
     gtk_widget_set_halign(win->world_record, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(win->footer),

@@ -85,9 +85,11 @@ Global style will be applied from ```~/.urn/style.css```.
 | .header                 |
 | .title                  |
 | .attempt-count          |
-| .timer                  |
-| .timer-millis           |
+| .time                   |
 | .delta                  |
+| .timer                  |
+| .timer-seconds          |
+| .timer-millis           |
 | .delay                  |
 | .splits                 |
 | .split                  |
