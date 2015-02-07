@@ -7,8 +7,8 @@ It was originally written because there were no exisiting
 solutions for split tracking with a delayed start available
 on *nix platforms.
 
-Urn requires ```libgtk+-3.0```, ```libkeybinder-3.0``` and
-```libjansson```.
+Urn requires ```libgtk+-3.0```, ```libkeybinder-3.0```
+and ```libjansson```.
 
 # Usage
 
@@ -80,8 +80,7 @@ The color of a time or delta has special meaning.
 ## Settings
 
 Currently there is no settings dialog, but you can change
-the values in ```wildmouse.urn``` path with
-```gsettings```.
+the values in ```wildmouse.urn``` path with ```gsettings```.
 
 | Key                        | Type    | Description                       |
 |----------------------------|---------|-----------------------------------|
@@ -99,13 +98,13 @@ the values in ```wildmouse.urn``` path with
 
 ## Themes
 
-Create a theme stylesheet and place it in
-```~/.urn/themes/<name>/<name>.css``` where ```name``` is
-the name of your theme. You can set the global theme by
+Create a theme stylesheet and place it
+in ```~/.urn/themes/<name>/<name>.css``` where ```name```
+is the name of your theme. You can set the global theme by
 changing the ```theme``` value in gsettings. Theme variants
 should follow the pattern ```<name>-<variant>.css```.
-Your splits can apply their own themes by specifying a
-```theme``` key in the main object. 
+Your splits can apply their own themes by specifying
+a ```theme``` key in the main object. 
 
 | Class                   |
 |-------------------------|
