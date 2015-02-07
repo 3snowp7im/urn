@@ -7,6 +7,9 @@ It was originally written because there were no exisiting
 solutions for split tracking with a delayed start available
 on *nix platforms.
 
+Urn requires ```libgtk+-3.0```, ```libkeybinder-3.0``` and
+```libjansson```.
+
 # Usage
 
 Initially the window is undecorated. You can toggle window decorations
@@ -30,6 +33,8 @@ you can manually change the current split:
 | Page Up   | Unsplit     |
 | Page Down | Skip split  |
 
+Keybinds can be configured by changing your gsettings.
+
 # Color Key
 
 The color of a time or delta has special meaning.
@@ -43,7 +48,7 @@ The color of a time or delta has special meaning.
 | Blue        | Best split time in any run             |
 | Gold        | Best segment time in any run           |
 
-# File format
+# Split Files
 
 * Stored as well-formed json
 * Must contain one main object
@@ -52,14 +57,16 @@ The color of a time or delta has special meaning.
 
 ## Main object
 
-| Key          | Value                                 |
-|--------------|---------------------------------------|
-| title        | Title string at top of window         |
-| start_delay  | Non-negative delay until timer starts |
-| world_record | Best known time                       |
-| splits       | Array of split objects                |
-| width        | Window width                          |
-| height       | Window height                         |
+| Key           | Value                                 |
+|---------------|---------------------------------------|
+| title         | Title string at top of window         |
+| start_delay   | Non-negative delay until timer starts |
+| world_record  | Best known time                       |
+| splits        | Array of split objects                |
+| theme         | Window theme                          |
+| theme_variant | Window theme variant                  |
+| width         | Window width                          |
+| height        | Window height                         |
 
 ## Split object
 
@@ -70,14 +77,35 @@ The color of a time or delta has special meaning.
 | best_time    | Your best split time   |
 | best_segment | Your best segment time |
 
-# Styling
+## Settings
 
-You can style the window by creating a ```.css``` file
-with the same name as your splits in the same directory.
-If your split file is ```game.json```, the stylesheet
-should be named ```game.css```.
+Currently there is no settings dialog, but you can change
+the values in ```wildmouse.urn``` path with
+```gsettings```.
 
-Global style will be applied from ```~/.urn/style.css```.
+| Key                        | Type    | Description                       |
+|----------------------------|---------|-----------------------------------|
+| start-decorated            | Boolean | Start with window decorations     |
+| hide-cursor                | Boolean | Hide cursor in window             |
+| global-hotkeys             | Boolean | Enables global hotkeys            |
+| theme                      | String  | Default theme name                |
+| theme-variant              | String  | Default theme variant             |
+| keybind-start-split        | String  | Start/split keybind               |
+| keybind-stop-reset         | String  | Stop/Reset keybind                |
+| keybind-cancel             | String  | Cancel keybind                    |
+| keybind-unsplit            | String  | Unsplit keybind                   |
+| keybind-skip-split         | String  | Skip split keybind                |
+| keybind-toggle-decorations | String  | Toggle window decorations keybind |
+
+## Themes
+
+Create a theme stylesheet and place it in
+```~/.urn/themes/<name>/<name>.css``` where ```name``` is
+the name of your theme. You can set the global theme by
+changing the ```theme``` value in gsettings. Theme variants
+should follow the pattern ```<name>-<variant>.css```.
+Your splits can apply their own themes by specifying a
+```theme``` key in the main object. 
 
 | Class                   |
 |-------------------------|

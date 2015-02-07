@@ -1,12 +1,13 @@
-BIN      := urn-gtk
-OBJS     := urn.o urn-gtk.o
-CFLAGS   := `pkg-config --cflags gtk+-3.0`
-LDLIBS   := -ljansson `pkg-config --libs gtk+-3.0`
-BIN_DIR  := /usr/local/bin
-APP      := urn.desktop
-APP_DIR  := /usr/share/applications
-ICON     := urn
-ICON_DIR := /usr/share/icons/hicolor
+BIN         := urn-gtk
+OBJS        := urn.o urn-gtk.o
+CFLAGS      := `pkg-config --cflags gtk+-3.0 keybinder-3.0 jansson`
+LDLIBS      := `pkg-config --libs gtk+-3.0 keybinder-3.0 jansson`
+BIN_DIR     := /usr/local/bin
+APP         := urn.desktop
+APP_DIR     := /usr/share/applications
+ICON        := urn
+ICON_DIR    := /usr/share/icons/hicolor
+SCHEMAS_DIR := /usr/share/glib-2.0/schemas
 
 $(BIN): $(OBJS)
 
@@ -23,13 +24,22 @@ install:
 	          $(ICON_DIR)/"$$size"x"$$size"/apps/$(ICON).png ; \
 	done
 	gtk-update-icon-cache -f -t $(ICON_DIR)
+	cp urn-gtk.gschema.xml $(SCHEMAS_DIR)
+	glib-compile-schemas $(SCHEMAS_DIR)
+	mkdir -p /usr/share/urn/themes
+	rsync -a --exclude=".*" themes /usr/share/urn
 
 uninstall:
 	rm -f $(BIN_DIR)/$(BIN)
 	rm -f $(APP_DIR)/$(APP)
+	rm -rf /usr/share/urn
 	for size in 16 22 24 32 36 48 64 72 96 128 256 512; do \
 	  rm -f $(ICON_DIR)/"$$size"x"$$size"/apps/$(ICON).png ; \
 	done
+
+remove-schema:
+	rm $(SCHEMAS_DIR)/urn-gtk.gschema.xml
+	glib-compile-schemas $(SCHEMAS_DIR)
 
 clean:
 	rm -f $(OBJS) $(BIN) urn-gtk.h

@@ -9,6 +9,8 @@
 struct urn_game {
     char *path;
     char *title;
+    char *theme;
+    char *theme_variant;
     int attempt_count;
     int width;
     int height;
