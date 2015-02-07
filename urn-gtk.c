@@ -6,6 +6,7 @@
 #include <pwd.h>
 #include <gtk/gtk.h>
 #include "urn.h"
+#include "urn-gtk.h"
 
 // get rid of some annoying deprecation warnings
 // on the computers i compile this on
@@ -31,79 +32,6 @@ typedef struct _UrnAppClass  UrnAppClass;
 
 typedef struct _UrnAppWindow         UrnAppWindow;
 typedef struct _UrnAppWindowClass    UrnAppWindowClass;
-
-static const char *urn_app_window_style =
-    ".window {\n"
-    "  background-color: #000;\n"
-    "  color: #FFF;\n"
-    "}\n"
-
-    ".title {\n"
-    "  font-size: large;\n"
-    "}\n"
-
-    ".attempt-count {\n"
-    "  color: #999;\n"
-    "}"
-
-    ".time, .delta {\n"
-    "  font-weight: bold;\n"
-    "}\n"
-
-    ".timer {\n"
-    "  font-size: 300%;\n"
-    "  font-weight: normal;\n"
-    "  text-shadow: 2px 2px #666;\n"
-    "}\n"
-
-    ".timer-millis {\n"
-    "  font-size: 75%;\n"
-    "}\n"
-
-    ".split-time {\n"
-    "  color: #FFF;\n"
-    "}\n"
-
-    ".done {\n"
-    "  color: #999;\n"
-    "}\n"
-
-    ".timer, .delta {\n"
-    "  color: #0C0;\n"
-    "}\n"
-
-    ".losing {\n"
-    "  color: #6A6;\n"
-    "}\n"
-
-    ".behind {\n"
-    "  color: #A66;\n"
-    "}\n"
-
-    ".behind.losing {\n"
-    "  color: #C00;\n"
-    "}\n"
-
-    ".delay {\n"
-    "  color: #999;\n"
-    "}\n"
-
-    ".best-segment {\n"
-    "  color: #F90;\n"
-    "}\n"
-
-    ".best-split {\n"
-    "  color: #99F;\n"
-    "}\n"
-
-    ".current-split {\n"
-    "  background-color: rgba(127, 127, 255, 0.3);\n"
-    "}\n"
-
-    ".split-last {\n"
-    "  border-top: 1px #FFF solid;\n"
-    "}\n"
-    ;
 
 struct _UrnAppWindow {
     GtkApplicationWindow parent;
@@ -748,7 +676,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     gtk_css_provider_load_from_data(
         GTK_CSS_PROVIDER(provider),
-        urn_app_window_style, -1, &error);
+        urn_gtk_css, -1, &error);
     g_object_unref(provider);
     g_clear_error(&error);
 

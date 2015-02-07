@@ -1,0 +1,68 @@
+.window {
+  background-color: #000;
+  color: #FFF;
+}
+.title {
+  font-size: large;
+}
+.attempt-count {
+  color: #999;
+}
+
+.time, .delta {
+  font-weight: bold;
+}
+
+.timer {
+  font-size: 300%;
+  font-weight: normal;
+  text-shadow: 2px 2px #666;
+}
+
+.timer-millis {
+  font-size: 75%;
+}
+
+.split-time {
+  color: #FFF;
+}
+
+.done {
+  color: #999;
+}
+
+.timer, .delta {
+  color: #0C0;
+}
+
+.losing {
+  color: #6A6;
+}
+
+.behind {
+  color: #A66;
+}
+
+.behind.losing {
+  color: #C00;
+}
+
+.delay {
+  color: #999;
+}
+
+.best-segment {
+  color: #F90;
+}
+
+.best-split {
+  color: #99F;
+}
+
+.current-split {
+  background-color: rgba(127, 127, 255, 0.3);
+}
+
+.split-last {
+  border-top: 1px #FFF solid;
+}

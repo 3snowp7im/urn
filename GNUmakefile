@@ -10,6 +10,11 @@ ICON_DIR := /usr/share/icons/hicolor
 
 $(BIN): $(OBJS)
 
+$(OBJS): urn-gtk.h
+
+urn-gtk.h: urn-gtk.css
+	xxd --include urn-gtk.css > urn-gtk.h
+
 install:
 	cp $(BIN) $(BIN_DIR)
 	cp $(APP) $(APP_DIR)
@@ -27,4 +32,4 @@ uninstall:
 	done
 
 clean:
-	rm -f $(OBJS) $(BIN)
+	rm -f $(OBJS) $(BIN) urn-gtk.h
