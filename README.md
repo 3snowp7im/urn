@@ -35,7 +35,7 @@ you can manually change the current split:
 
 Keybinds can be configured by changing your gsettings.
 
-## Settings
+# Settings
 
 Currently there is no settings dialog, but you can change
 the values in ```wildmouse.urn``` path with ```gsettings```.
