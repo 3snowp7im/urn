@@ -8,8 +8,7 @@ It was originally written because there were no exisiting
 solutions for split tracking with a delayed start available
 on *nix platforms.
 
-Urn requires ```libgtk+-3.0```, ```libkeybinder-3.0```
-and ```libjansson```.
+Urn requires ```libgtk+-3.0```, ```x11``` and ```libjansson```.
 
 # Usage
 

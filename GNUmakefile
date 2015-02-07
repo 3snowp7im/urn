@@ -1,7 +1,8 @@
 BIN         := urn-gtk
-OBJS        := urn.o urn-gtk.o
-CFLAGS      := `pkg-config --cflags gtk+-3.0 keybinder-3.0 jansson`
-LDLIBS      := `pkg-config --libs gtk+-3.0 keybinder-3.0 jansson`
+OBJS        := urn.o urn-gtk.o bind.o
+LIBS        := gtk+-3.0 x11 jansson
+CFLAGS      := `pkg-config --cflags $(LIBS)`
+LDLIBS      := `pkg-config --libs $(LIBS)`
 BIN_DIR     := /usr/local/bin
 APP         := urn.desktop
 APP_DIR     := /usr/share/applications

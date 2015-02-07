@@ -6,9 +6,9 @@
 #include <sys/stat.h>
 #include <pwd.h>
 #include <gtk/gtk.h>
-#include <keybinder.h>
 #include "urn.h"
 #include "urn-gtk.h"
+#include "keybinder.h"
 
 // get rid of some annoying deprecation warnings
 // on the computers i compile this on
@@ -147,10 +147,13 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     gtk_label_set_text(GTK_LABEL(win->personal_best), "");
 
     // remove game's style
-    screen = gdk_display_get_default_screen(win->display);
-    gtk_style_context_remove_provider_for_screen(
-        screen, GTK_STYLE_PROVIDER(win->style));
-    g_object_unref(win->style);
+    if (win->style) {
+        screen = gdk_display_get_default_screen(win->display);
+        gtk_style_context_remove_provider_for_screen(
+            screen, GTK_STYLE_PROVIDER(win->style));
+        g_object_unref(win->style);
+        win->style = NULL;
+    }
 }
 
 static gboolean urn_app_window_step(gpointer data) {
@@ -503,7 +506,7 @@ static void toggle_decorations(UrnAppWindow *win) {
     win->decorated = !win->decorated;
 }
 
-static void keybind_start_split(const char *str, UrnAppWindow *win) {
+static void keybind_start_split(GtkWidget *widget, UrnAppWindow *win) {
     timer_start_split(win);
 }
 
@@ -750,6 +753,7 @@ static void urn_app_window_init(UrnAppWindow *win) {
     const char *theme_variant;
     
     win->display = gdk_display_get_default();
+    win->style = NULL;
 
     // make data path
     pw = getpwuid(getuid());
