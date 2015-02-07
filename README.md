@@ -35,6 +35,25 @@ you can manually change the current split:
 
 Keybinds can be configured by changing your gsettings.
 
+## Settings
+
+Currently there is no settings dialog, but you can change
+the values in ```wildmouse.urn``` path with ```gsettings```.
+
+| Key                        | Type    | Description                       |
+|----------------------------|---------|-----------------------------------|
+| start-decorated            | Boolean | Start with window decorations     |
+| hide-cursor                | Boolean | Hide cursor in window             |
+| global-hotkeys             | Boolean | Enables global hotkeys            |
+| theme                      | String  | Default theme name                |
+| theme-variant              | String  | Default theme variant             |
+| keybind-start-split        | String  | Start/split keybind               |
+| keybind-stop-reset         | String  | Stop/Reset keybind                |
+| keybind-cancel             | String  | Cancel keybind                    |
+| keybind-unsplit            | String  | Unsplit keybind                   |
+| keybind-skip-split         | String  | Skip split keybind                |
+| keybind-toggle-decorations | String  | Toggle window decorations keybind |
+
 # Color Key
 
 The color of a time or delta has special meaning.
@@ -77,26 +96,7 @@ The color of a time or delta has special meaning.
 | best_time    | Your best split time   |
 | best_segment | Your best segment time |
 
-## Settings
-
-Currently there is no settings dialog, but you can change
-the values in ```wildmouse.urn``` path with ```gsettings```.
-
-| Key                        | Type    | Description                       |
-|----------------------------|---------|-----------------------------------|
-| start-decorated            | Boolean | Start with window decorations     |
-| hide-cursor                | Boolean | Hide cursor in window             |
-| global-hotkeys             | Boolean | Enables global hotkeys            |
-| theme                      | String  | Default theme name                |
-| theme-variant              | String  | Default theme variant             |
-| keybind-start-split        | String  | Start/split keybind               |
-| keybind-stop-reset         | String  | Stop/Reset keybind                |
-| keybind-cancel             | String  | Cancel keybind                    |
-| keybind-unsplit            | String  | Unsplit keybind                   |
-| keybind-skip-split         | String  | Skip split keybind                |
-| keybind-toggle-decorations | String  | Toggle window decorations keybind |
-
-## Themes
+# Themes
 
 Create a theme stylesheet and place it
 in ```~/.urn/themes/<name>/<name>.css``` where ```name```
