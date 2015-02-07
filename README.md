@@ -55,7 +55,7 @@ the values in ```wildmouse.urn``` path with ```gsettings```.
 | keybind-toggle-decorations | String  | Toggle window decorations keybind |
 
 Keybind strings should be parseable by
-[gtk-accelerator-parse](https://developer.gnome.org/gtk3/stable/gtk3-Keyboard-Accelerators.html#gtk-accelerator-parse).
+[gtk_accelerator_parse](https://developer.gnome.org/gtk3/stable/gtk3-Keyboard-Accelerators.html#gtk-accelerator-parse).
 
 # Color Key
 
