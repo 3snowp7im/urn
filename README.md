@@ -54,6 +54,9 @@ the values in ```wildmouse.urn``` path with ```gsettings```.
 | keybind-skip-split         | String  | Skip split keybind                |
 | keybind-toggle-decorations | String  | Toggle window decorations keybind |
 
+Keybind strings should be parseable by
+[gtk-accelerator-parse](https://developer.gnome.org/gtk3/stable/gtk3-Keyboard-Accelerators.html#gtk-accelerator-parse).
+
 # Color Key
 
 The color of a time or delta has special meaning.
@@ -104,7 +107,10 @@ is the name of your theme. You can set the global theme by
 changing the ```theme``` value in gsettings. Theme variants
 should follow the pattern ```<name>-<variant>.css```.
 Your splits can apply their own themes by specifying
-a ```theme``` key in the main object. 
+a ```theme``` key in the main object.
+
+For a list of supported CSS properties, see
+[GtkCssProvider](https://developer.gnome.org/gtk3/stable/GtkCssProvider.html).
 
 | Class                   |
 |-------------------------|
