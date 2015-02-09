@@ -14,13 +14,16 @@
 }
 
 .timer {
-  font-size: 300%;
   font-weight: normal;
   text-shadow: 2px 2px #666;
 }
 
+.timer-seconds {
+  font-size: 300%;
+}
+
 .timer-millis {
-  font-size: 75%;
+  font-size: 225%;
 }
 
 .split-time {
