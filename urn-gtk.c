@@ -616,7 +616,8 @@ static gboolean urn_app_window_draw(gpointer data) {
                 || win->timer->split_deltas[i] >= SHOW_DELTA_THRESHOLD) {
                 if (win->timer->split_info[i] & URN_INFO_BEST_SPLIT) {
                     add_class(win->split_deltas[i], "best-split");
-                } else if (win->timer->split_info[i]
+                }
+                if (win->timer->split_info[i]
                            & URN_INFO_BEST_SEGMENT) {
                     add_class(win->split_deltas[i], "best-segment");
                 } else if (win->timer->split_info[i]
