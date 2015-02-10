@@ -290,10 +290,10 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
     win->split_times = calloc(win->split_count, sizeof(GtkWidget *));
 
     for (i = 0; i < win->split_count; ++i) {
-        GtkWidget *grid;
         
         win->splits[i] = gtk_grid_new();
         add_class(win->splits[i], "split");
+        gtk_grid_set_column_homogeneous(GTK_GRID(win->splits[i]), TRUE);
         gtk_container_add(GTK_CONTAINER(win->split_box), win->splits[i]);
         gtk_widget_show(win->splits[i]);
 
@@ -313,26 +313,22 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
 
         win->split_titles[i] = gtk_label_new(win->game->split_titles[i]);
         add_class(win->split_titles[i], "split-title");
-        gtk_widget_set_hexpand(win->split_titles[i], TRUE);
         gtk_widget_set_halign(win->split_titles[i], GTK_ALIGN_START);
         gtk_grid_attach(GTK_GRID(win->splits[i]),
-                        win->split_titles[i], 0, 0, 1, 1);
+                        win->split_titles[i], 0, 0, 2, 1);
         gtk_widget_show(win->split_titles[i]);
 
-        grid = gtk_grid_new();
-        gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
-        gtk_grid_attach(GTK_GRID(win->splits[i]), grid, 1, 0, 1, 1);
-        gtk_widget_show(grid);
-        
         win->split_deltas[i] = gtk_label_new(NULL);
         add_class(win->split_deltas[i], "split-delta");
-        gtk_grid_attach(GTK_GRID(grid), win->split_deltas[i], 0, 0, 2, 1);
+        gtk_grid_attach(GTK_GRID(win->splits[i]),
+                        win->split_deltas[i], 2, 0, 1, 1);
         gtk_widget_show(win->split_deltas[i]);
         
         win->split_times[i] = gtk_label_new(NULL);
         add_class(win->split_times[i], "split-time");
         gtk_widget_set_halign(win->split_times[i], GTK_ALIGN_END);
-        gtk_grid_attach(GTK_GRID(grid), win->split_times[i], 2, 0, 3, 1);
+        gtk_grid_attach(GTK_GRID(win->splits[i]),
+                        win->split_times[i], 3, 0, 1, 1);
         gtk_widget_show(win->split_times[i]);
         
         if (win->game->split_times[i]) {
