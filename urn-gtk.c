@@ -617,11 +617,10 @@ static gboolean urn_app_window_draw(gpointer data) {
                 if (win->timer->split_info[i] & URN_INFO_BEST_SPLIT) {
                     add_class(win->split_deltas[i], "best-split");
                 }
-                if (win->timer->split_info[i]
-                           & URN_INFO_BEST_SEGMENT) {
+                if (win->timer->split_info[i] & URN_INFO_BEST_SEGMENT) {
                     add_class(win->split_deltas[i], "best-segment");
-                } else if (win->timer->split_info[i]
-                           & URN_INFO_BEHIND_TIME) {
+                }
+                if (win->timer->split_info[i] & URN_INFO_BEHIND_TIME) {
                     add_class(win->split_deltas[i], "behind");
                     if (win->timer->split_info[i]
                         & URN_INFO_LOSING_TIME) {
