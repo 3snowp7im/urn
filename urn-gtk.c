@@ -54,9 +54,9 @@ struct _UrnAppWindow {
     GtkAdjustment *split_adjust;
     GtkWidget *split_scroller;
     GtkWidget *split_viewport;
+    GtkWidget **split_rows;
     GtkWidget **split_titles;
     GtkWidget **split_deltas;
-    GtkWidget **split_spacers;
     GtkWidget **split_times;
     GtkWidget *footer;
     GtkWidget *sum_of_bests;
@@ -130,12 +130,14 @@ static void urn_app_window_clear_game(UrnAppWindow *win) {
     gtk_widget_hide(win->world_record_label);
     gtk_widget_hide(win->world_record);
     for (i = win->split_count - 1; i >= 0; --i) {
-        gtk_grid_remove_row(GTK_GRID(win->splits), i);
+        gtk_container_remove(
+            GTK_CONTAINER(gtk_widget_get_parent(win->split_rows[i])),
+            win->split_rows[i]);
     }
     gtk_adjustment_set_value(win->split_adjust, 0);
+    free(win->split_rows);
     free(win->split_titles);
     free(win->split_deltas);
-    free(win->split_spacers);
     free(win->split_times);
     win->split_count = 0;
     gtk_label_set_text(GTK_LABEL(win->time_seconds), "");
@@ -182,40 +184,25 @@ static void urn_app_window_split_trailer(UrnAppWindow *win) {
         int last = win->split_count - 1;
         int split_h;
         int height;
-        g_object_ref(win->split_titles[last]);
-        g_object_ref(win->split_deltas[last]);
-        g_object_ref(win->split_spacers[last]);
-        g_object_ref(win->split_times[last]);
+        g_object_ref(win->split_rows[last]);
         split_h = gtk_widget_get_allocated_height(win->split_titles[last]);
         height = gtk_widget_get_allocated_height(win->splits);
-        if (gtk_widget_get_parent(win->split_titles[last]) == win->splits) {
+        if (gtk_widget_get_parent(win->split_rows[last]) == win->splits) {
             if (curr_scroll + page_size < scroll_max) {
                 // move last split to split_last
-                gtk_grid_remove_row(GTK_GRID(win->splits), last);
-                gtk_grid_attach(GTK_GRID(win->split_last),
-                                win->split_titles[last], 0, 0, 1, 1);
-                gtk_grid_attach(GTK_GRID(win->split_last),
-                                win->split_deltas[last], 1, 0, 1, 1);
-                gtk_grid_attach(GTK_GRID(win->split_last),
-                                win->split_spacers[last], 2, 0, 1, 1);
-                gtk_grid_attach(GTK_GRID(win->split_last),
-                                win->split_times[last], 3, 0, 1, 1);
-                gtk_adjustment_set_upper(win->split_adjust,
-                                         scroll_max - split_h);
+                gtk_container_remove(GTK_CONTAINER(win->splits),
+                                     win->split_rows[last]);
+                gtk_container_add(GTK_CONTAINER(win->split_last),
+                                  win->split_rows[last]);
                 gtk_widget_show(win->split_last);
             }
         } else {
             if (curr_scroll + page_size == scroll_max) {
                 // move last split to split box
-                gtk_grid_remove_row(GTK_GRID(win->split_last), 0);
-                gtk_grid_attach(GTK_GRID(win->splits),
-                                win->split_titles[last], 0, last, 1, 1);
-                gtk_grid_attach(GTK_GRID(win->splits),
-                                win->split_deltas[last], 1, last, 1, 1);
-                gtk_grid_attach(GTK_GRID(win->splits),
-                                win->split_spacers[last], 2, last, 1, 1);
-                gtk_grid_attach(GTK_GRID(win->splits),
-                                win->split_times[last], 3, last, 1, 1);
+                gtk_container_remove(GTK_CONTAINER(win->split_last),
+                                     win->split_rows[last]);
+                gtk_container_add(GTK_CONTAINER(win->splits),
+                                  win->split_rows[last]);
                 gtk_adjustment_set_upper(win->split_adjust,
                                          scroll_max + height);
                 gtk_adjustment_set_value(win->split_adjust,
@@ -223,10 +210,7 @@ static void urn_app_window_split_trailer(UrnAppWindow *win) {
                 gtk_widget_hide(win->split_last);
             }
         }
-        g_object_unref(win->split_titles[last]);
-        g_object_unref(win->split_deltas[last]);
-        g_object_unref(win->split_spacers[last]);
-        g_object_unref(win->split_times[last]);
+        g_object_unref(win->split_rows[last]);
     }
 }
 
@@ -300,52 +284,44 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
     gtk_label_set_text(GTK_LABEL(win->attempt_count), str);
 
     win->split_count = win->game->split_count;
+    win->split_rows = calloc(win->split_count, sizeof(GtkWidget *));
     win->split_titles = calloc(win->split_count, sizeof(GtkWidget *));
     win->split_deltas = calloc(win->split_count, sizeof(GtkWidget *));
-    win->split_spacers = calloc(win->split_count, sizeof(GtkWidget *));
     win->split_times = calloc(win->split_count, sizeof(GtkWidget *));
 
     for (i = 0; i < win->split_count; ++i) {
-        GtkWidget *title, *spacer;
+        win->split_rows[i] = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+        add_class(win->split_rows[i], "split");
+        gtk_widget_set_hexpand(win->split_rows[i], TRUE);
+        gtk_container_add(GTK_CONTAINER(win->splits),
+                          win->split_rows[i]);
         
-        win->split_titles[i] = gtk_grid_new();
+        win->split_titles[i] = gtk_label_new(win->game->split_titles[i]);
         add_class(win->split_titles[i], "split-title");
-        gtk_grid_attach(GTK_GRID(win->splits),
-                        win->split_titles[i], 0, i, 1, 1);
-
-        title = gtk_label_new(win->game->split_titles[i]);
-        gtk_widget_set_halign(title, GTK_ALIGN_START);
-        gtk_grid_attach(GTK_GRID(win->split_titles[i]), title, 0, 0, 1, 1);
-        gtk_widget_show(title);
-
-        spacer = gtk_grid_new();
-        gtk_widget_set_hexpand(spacer, TRUE);
-        gtk_grid_attach(GTK_GRID(win->split_titles[i]), spacer, 1, 0, 1, 1);
-        gtk_widget_show(spacer);
+        gtk_widget_set_halign(win->split_titles[i], GTK_ALIGN_START);
+        gtk_widget_set_hexpand(win->split_titles[i], TRUE);
+        gtk_container_add(GTK_CONTAINER(win->split_rows[i]),
+                          win->split_titles[i]);
 
         win->split_deltas[i] = gtk_label_new(NULL);
-        gtk_widget_set_size_request(win->split_deltas[i], 1, -1);
         add_class(win->split_deltas[i], "split-delta");
-        gtk_grid_attach(GTK_GRID(win->splits),
-                        win->split_deltas[i], 1, i, 1, 1);
-
-        win->split_spacers[i] = gtk_grid_new();
-        gtk_widget_set_size_request(win->split_spacers[i], WINDOW_PAD * 2, -1);
-        gtk_grid_attach(GTK_GRID(win->splits),
-                        win->split_spacers[i], 2, i, 1, 1);
+        gtk_widget_set_size_request(win->split_deltas[i], 1, -1);
+        gtk_container_add(GTK_CONTAINER(win->split_rows[i]),
+                          win->split_deltas[i]);
 
         win->split_times[i] = gtk_label_new(NULL);
         add_class(win->split_times[i], "split-time");
         gtk_widget_set_halign(win->split_times[i], GTK_ALIGN_END);
-        gtk_grid_attach(GTK_GRID(win->splits),
-                        win->split_times[i], 3, i, 1, 1);
+        gtk_container_add(GTK_CONTAINER(win->split_rows[i]),
+                          win->split_times[i]);
 
         if (win->game->split_times[i]) {
             urn_split_string(str, win->game->split_times[i]);
             gtk_label_set_text(GTK_LABEL(win->split_times[i]), str);
         }
 
-        if (win->game->split_titles[i] && strlen(win->game->split_titles[i])) {
+        if (win->game->split_titles[i]
+            && strlen(win->game->split_titles[i])) {
             char *c = &str[12];
             strcpy(str, "split-title-");
             strcpy(c, win->game->split_titles[i]);
@@ -356,16 +332,10 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
                     *c = tolower(*c);
                 }
             } while (*++c != '\0');
-            add_class(win->split_titles[i], str);
-            add_class(win->split_deltas[i], str);
-            add_class(win->split_spacers[i], str);
-            add_class(win->split_times[i], str);
+            add_class(win->split_rows[i], str);
         }
 
-        gtk_widget_show(win->split_titles[i]);
-        gtk_widget_show(win->split_deltas[i]);
-        gtk_widget_show(win->split_spacers[i]);
-        gtk_widget_show(win->split_times[i]);
+        gtk_widget_show_all(win->split_rows[i]);
     }
     if (win->split_count) {
         // sum of bests
@@ -606,15 +576,9 @@ static gboolean urn_app_window_draw(gpointer data) {
         for (i = 0; i < win->split_count; ++i) {
             if (i == win->timer->curr_split
                 && win->timer->start_time) {
-                add_class(win->split_titles[i], "current-split");
-                add_class(win->split_deltas[i], "current-split");
-                add_class(win->split_spacers[i], "current-split");
-                add_class(win->split_times[i], "current-split");
+                add_class(win->split_rows[i], "current-split");
             } else {
-                remove_class(win->split_titles[i], "current-split");
-                remove_class(win->split_deltas[i], "current-split");
-                remove_class(win->split_spacers[i], "current-split");
-                remove_class(win->split_times[i], "current-split");
+                remove_class(win->split_rows[i], "current-split");
             }
             
             remove_class(win->split_times[i], "time");
@@ -674,21 +638,26 @@ static gboolean urn_app_window_draw(gpointer data) {
             int time_width = 0, delta_width = 0;
             int i;
             for (i = 0; i < win->split_count; ++i) {
+                width = gtk_widget_get_allocated_width(win->split_deltas[i]);
+                if (width > delta_width) {
+                    delta_width = width;
+                }
                 width = gtk_widget_get_allocated_width(win->split_times[i]);
                 if (width > time_width) {
                     time_width = width;
                 }
             }
-            if (time_width) {
-                for (i = 0; i < win->split_count; ++i) {
-                    // Why the FUCK is this hack necessary????????????????????
-                    // we have to set the margin because for some reason a label
-                    // with a specific size request has its text aligned to the
-                    // center. This is all I can do to fix it, it seems.
-                    width = gtk_widget_get_allocated_width(win->split_times[i]);
+            for (i = 0; i < win->split_count; ++i) {
+                if (delta_width) {
+                    gtk_widget_set_size_request(
+                        win->split_deltas[i], delta_width, -1);
+                }
+                if (time_width) {
+                    width = gtk_widget_get_allocated_width(
+                        win->split_times[i]);
                     gtk_widget_set_margin_left(
                         win->split_times[i],
-                        time_width - width);
+                        WINDOW_PAD * 2 + (time_width - width));
                 }
             }
         }
@@ -958,13 +927,13 @@ static void urn_app_window_init(UrnAppWindow *win) {
     gtk_container_add(GTK_CONTAINER(win->split_scroller), win->split_viewport);
     gtk_widget_show(win->split_viewport);
 
-    win->splits = gtk_grid_new();
+    win->splits = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     add_class(win->splits, "splits");
     gtk_widget_set_hexpand(win->splits, TRUE);
     gtk_container_add(GTK_CONTAINER(win->split_viewport), win->splits);
     gtk_widget_show(win->splits);
     
-    win->split_last = gtk_grid_new();
+    win->split_last = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     add_class(win->split_last, "split-last");
     gtk_widget_set_margin_left(win->split_last, WINDOW_PAD);
     gtk_widget_set_margin_right(win->split_last, WINDOW_PAD);
