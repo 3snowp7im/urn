@@ -642,19 +642,24 @@ int urn_timer_skip(urn_timer *timer) {
 }
 
 int urn_timer_unsplit(urn_timer *timer) {
-    if (timer->running) {
-        if (timer->curr_split) {
-            int curr;
-            timer->split_times[timer->curr_split] =
-                timer->game->split_times[timer->curr_split];
-            timer->split_deltas[timer->curr_split] = 0;
-            timer->segment_times[timer->curr_split] =
-                timer->game->segment_times[timer->curr_split];
-            timer->segment_deltas[timer->curr_split] = 0;
-            curr = timer->curr_split;
+    if (timer->curr_split) {
+        int curr;
+        if (timer->curr_split == timer->game->split_count) {
             --timer->curr_split;
-            return curr;
         }
+        timer->split_times[timer->curr_split] =
+            timer->game->split_times[timer->curr_split];
+        timer->split_deltas[timer->curr_split] = 0;
+        timer->segment_times[timer->curr_split] =
+            timer->game->segment_times[timer->curr_split];
+        timer->segment_deltas[timer->curr_split] = 0;
+        curr = timer->curr_split;
+        if (timer->running) {
+            --timer->curr_split;
+        } else {
+            timer->running = 1;
+        }
+        return curr;
     }
     return 0;
 }
