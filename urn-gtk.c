@@ -763,6 +763,10 @@ static gboolean urn_app_window_draw(gpointer data) {
 
         //resize_window(win);
         urn_app_window_split_trailer(win);
+    } else {
+        GdkRectangle rect;
+        gtk_widget_get_allocation(GTK_WIDGET(win), &rect);
+        gdk_window_invalidate_rect(gtk_widget_get_window(GTK_WIDGET(win)), &rect, FALSE);
     }
     return TRUE;
 }
