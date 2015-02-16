@@ -766,7 +766,8 @@ static gboolean urn_app_window_draw(gpointer data) {
     } else {
         GdkRectangle rect;
         gtk_widget_get_allocation(GTK_WIDGET(win), &rect);
-        gdk_window_invalidate_rect(gtk_widget_get_window(GTK_WIDGET(win)), &rect, FALSE);
+        gdk_window_invalidate_rect(gtk_widget_get_window(GTK_WIDGET(win)),
+                                   &rect, FALSE);
     }
     return TRUE;
 }
