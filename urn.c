@@ -122,6 +122,12 @@ void urn_game_release(urn_game *game) {
     if (game->title) {
         free(game->title);
     }
+    if (game->theme) {
+        free(game->theme);
+    }
+    if (game->theme_variant) {
+        free(game->theme_variant);
+    }
     if (game->split_titles) {
         for (i = 0; i < game->split_count; ++i) {
             if (game->split_titles[i]) {
@@ -174,6 +180,24 @@ int urn_game_create(urn_game **game_ptr, const char *path) {
     if (ref) {
         game->title = strdup(json_string_value(ref));
         if (!game->title) {
+            error = 1;
+            goto game_create_done;
+        }
+    }
+    // copy theme
+    ref = json_object_get(json, "theme");
+    if (ref) {
+        game->theme = strdup(json_string_value(ref));
+        if (!game->theme) {
+            error = 1;
+            goto game_create_done;
+        }
+    }
+    // copy theme variant
+    ref = json_object_get(json, "theme_variant");
+    if (ref) {
+        game->theme_variant = strdup(json_string_value(ref));
+        if (!game->theme_variant) {
             error = 1;
             goto game_create_done;
         }
@@ -333,7 +357,8 @@ int urn_game_save(const urn_game *game) {
         json_object_set_new(json, "title", json_string(game->title));
     }
     if (game->attempt_count) {
-        json_object_set_new(json, "attempt_count", json_integer(game->attempt_count));
+        json_object_set_new(json, "attempt_count",
+                            json_integer(game->attempt_count));
     }
     if (game->world_record) {
         urn_time_string_serialized(str, game->world_record);
@@ -356,6 +381,13 @@ int urn_game_save(const urn_game *game) {
         json_array_append_new(splits, split);
     }
     json_object_set_new(json, "splits", splits);
+    if (game->theme) {
+        json_object_set_new(json, "theme", json_string(game->theme));
+    }
+    if (game->theme_variant) {
+        json_object_set_new(json, "theme_variant",
+                            json_string(game->theme_variant));
+    }
     if (game->width) {
         json_object_set_new(json, "width", json_integer(game->width));
     }
@@ -611,20 +643,21 @@ int urn_timer_skip(urn_timer *timer) {
 }
 
 int urn_timer_unsplit(urn_timer *timer) {
-    if (timer->running) {
-        if (timer->curr_split) {
-            int curr;
-            timer->split_times[timer->curr_split] =
-                timer->game->split_times[timer->curr_split];
-            timer->split_deltas[timer->curr_split] = 0;
-            timer->split_info[timer->curr_split] = 0;
-            timer->segment_times[timer->curr_split] =
-                timer->game->segment_times[timer->curr_split];
-            timer->segment_deltas[timer->curr_split] = 0;
-            curr = timer->curr_split;
-            --timer->curr_split;
-            return curr;
+    if (timer->curr_split) {
+        int curr = timer->curr_split;
+        if (curr == timer->game->split_count) {
+            --curr;
         }
+        timer->split_times[curr] = timer->game->split_times[curr];
+        timer->split_deltas[curr] = 0;
+        timer->split_info[curr] = 0;
+        timer->segment_times[curr] = timer->game->segment_times[curr];
+        timer->segment_deltas[curr] = 0;
+        if (timer->curr_split == timer->game->split_count) {
+            timer->running = 1;
+        }
+        --timer->curr_split;
+        return curr;
     }
     return 0;
 }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/wildmouse/urn/" id="wildmouse.urn">
+    <key name="start-decorated" type="b">
+      <default>false</default>
+      <summary>Start decorated</summary>
+      <description>Start with window decorations.</description>
+    </key>
+    <key name="hide-cursor" type="b">
+      <default>true</default>
+      <summary>Hide cursor</summary>
+      <description>Hides the cursor when it hovers over the window.</description>
+    </key>
+    <key name="theme" type="s">
+      <default>'standard'</default>
+      <summary>Theme</summary>
+      <description>Window theme.</description>
+    </key>
+    <key name="theme-variant" type="s">
+      <default>''</default>
+      <summary>Theme variant</summary>
+      <description>Window theme variant.</description>
+    </key>
+    <key name="global-hotkeys" type="b">
+      <default>false</default>
+      <summary>Global hotkeys</summary>
+      <description>Enables global hotkeys for timer controls.</description>
+    </key>
+    <key name="keybind-start-split" type="s">
+      <default>'space'</default>
+      <summary>Start/split keybind</summary>
+      <description>Key for starting / splitting the timer.</description>
+    </key>
+    <key name="keybind-stop-reset" type="s">
+      <default>'BackSpace'</default>
+      <summary>Stop/Reset keybind</summary>
+      <description>Key for stopping / resetting the timer.</description>
+    </key>
+    <key name="keybind-cancel" type="s">
+      <default>'Delete'</default>
+      <summary>Cancel keybind</summary>
+      <description>Key for canceling the run timer.</description>
+    </key>
+    <key name="keybind-unsplit" type="s">
+      <default>'Page_Up'</default>
+      <summary>Unsplit keybind</summary>
+      <description>Key for unsplitting.</description>
+    </key>
+    <key name="keybind-skip-split" type="s">
+      <default>'Page_Down'</default>
+      <summary>Skip split keybind</summary>
+      <description>Key for skipping the current split.</description>
+    </key>
+    <key name="keybind-toggle-decorations" type="s">
+      <default>'Control_R'</default>
+      <summary>Toggle window decorations keybind</summary>
+      <description>Key for toggling window decorations.</description>
+    </key>
+  </schema>
+</schemalist>
