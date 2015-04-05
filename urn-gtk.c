@@ -687,12 +687,9 @@ static gboolean urn_app_window_draw(gpointer data) {
                     if (win->timer->split_info[prev]
                         & URN_INFO_BEST_SEGMENT) {
                         add_class(win->previous_segment, "best-segment");
-                    } else {
-                        remove_class(win->previous_segment, "best-segment");
-                        if (win->timer->segment_deltas[prev] > 0) {
-                            add_class(win->previous_segment, "behind");
-                            add_class(win->previous_segment, "losing");
-                        }
+                    } else if (win->timer->segment_deltas[prev] > 0) {
+                        add_class(win->previous_segment, "behind");
+                        add_class(win->previous_segment, "losing");
                     }
                     add_class(win->previous_segment, "delta");
                     urn_delta_string(str, win->timer->segment_deltas[prev]);
