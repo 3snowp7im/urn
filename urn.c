@@ -644,12 +644,15 @@ int urn_timer_skip(urn_timer *timer) {
 
 int urn_timer_unsplit(urn_timer *timer) {
     if (timer->curr_split) {
+        int i;
         int curr = --timer->curr_split;
-        timer->split_times[curr] = timer->game->split_times[curr];
-        timer->split_deltas[curr] = 0;
-        timer->split_info[curr] = 0;
-        timer->segment_times[curr] = timer->game->segment_times[curr];
-        timer->segment_deltas[curr] = 0;
+        for (i = curr; i < timer->game->split_count; ++i) {
+            timer->split_times[i] = timer->game->split_times[i];
+            timer->split_deltas[i] = 0;
+            timer->split_info[i] = 0;
+            timer->segment_times[i] = timer->game->segment_times[i];
+            timer->segment_deltas[i] = 0;
+        }
         if (timer->curr_split + 1 == timer->game->split_count) {
             timer->running = 1;
         }
