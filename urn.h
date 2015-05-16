@@ -32,6 +32,7 @@ struct urn_timer {
     long long start_time;
     long long time;
     long long sum_of_bests;
+    long long world_record;
     int curr_split;
     long long *split_times;
     long long *split_deltas;

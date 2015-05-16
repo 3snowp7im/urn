@@ -325,6 +325,11 @@ void urn_game_update_splits(urn_game *game,
         if (timer->curr_split > game->split_count) {
             curr = game->split_count - 1;
         }
+        if (timer->split_times[game->split_count - 1]
+            && timer->split_times[game->split_count - 1]
+            < game->world_record) {
+            game->world_record = timer->split_times[game->split_count - 1];
+        }
         size = timer->curr_split * sizeof(long long);
         memcpy(game->split_times, timer->split_times, size);
         memcpy(game->segment_times, timer->segment_times, size);
@@ -629,7 +634,7 @@ int urn_timer_split(urn_timer *timer) {
 }
 
 int urn_timer_skip(urn_timer *timer) {
-    if (timer->running) {
+    if (timer->running && timer->time > 0) {
         if (timer->curr_split < timer->game->split_count) {
             timer->split_times[timer->curr_split] = 0;
             timer->split_deltas[timer->curr_split] = 0;

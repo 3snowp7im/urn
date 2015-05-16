@@ -358,15 +358,16 @@ static void urn_app_window_show_game(UrnAppWindow *win) {
     remove_class(win->time, "behind");
     remove_class(win->time, "losing");
 
+    gtk_widget_set_halign(win->world_record_label, GTK_ALIGN_START);
+    gtk_widget_set_hexpand(win->world_record_label, TRUE);
     if (win->game->world_record) {
         char str[256];
-        gtk_widget_set_halign(win->world_record_label, GTK_ALIGN_START);
-        gtk_widget_set_hexpand(win->world_record_label, TRUE);
         urn_time_string(str, win->game->world_record);
         gtk_label_set_text(GTK_LABEL(win->world_record), str);
-        gtk_widget_show(win->world_record_label);
         gtk_widget_show(win->world_record);
+        gtk_widget_show(win->world_record_label);
     }
+
     gtk_widget_show(win->box);
     gtk_widget_show(win->splits);
 
@@ -756,6 +757,20 @@ static gboolean urn_app_window_draw(gpointer data) {
             urn_time_string(
                 str, win->game->split_times[win->game->split_count - 1]);
             gtk_label_set_text(GTK_LABEL(win->personal_best), str);
+        }
+
+        // World record
+        if (win->timer->curr_split == win->game->split_count
+            && win->game->world_record) {
+            if (win->timer->split_times[win->game->split_count - 1]
+                && win->timer->split_times[win->game->split_count - 1]
+                < win->game->world_record) {
+                urn_time_string(str, win->timer->split_times[
+                                    win->game->split_count - 1]);
+            } else {
+                urn_time_string(str, win->game->world_record);
+            }
+            gtk_label_set_text(GTK_LABEL(win->world_record), str);
         }
 
         //resize_window(win);
