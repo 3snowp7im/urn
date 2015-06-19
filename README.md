@@ -137,8 +137,8 @@ For a list of supported CSS properties, see
 | .best-segment           |
 | .best-split             |
 | .footer                 |
-| .previous-segment-label |
-| .previous-segment       |
+| .prev-segment-label |
+| .prev-segment       |
 | .sum-of-bests-label     |
 | .sum-of-bests           |
 | .personal-best-label    |
