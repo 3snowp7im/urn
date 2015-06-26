@@ -15,7 +15,7 @@ $(BIN): $(OBJS)
 $(OBJS): urn-gtk.h
 
 urn-gtk.h: urn-gtk.css
-	xxd --include urn-gtk.css > urn-gtk.h
+	xxd --include urn-gtk.css > urn-gtk.h || (rm urn-gtk.h; false)
 
 install:
 	cp $(BIN) $(BIN_DIR)
