@@ -1064,7 +1064,10 @@ static void urn_app_window_class_init(UrnAppWindowClass *class) {
 }
 
 static UrnAppWindow *urn_app_window_new(UrnApp *app) {
-    return g_object_new(URN_APP_WINDOW_TYPE, "application", app, NULL);
+    UrnAppWindow *win;
+    win = g_object_new(URN_APP_WINDOW_TYPE, "application", app, NULL);
+    gtk_window_set_type_hint(GTK_WINDOW(win), GDK_WINDOW_TYPE_HINT_DIALOG);
+    return win;
 }
 
 static void urn_app_window_open(UrnAppWindow *win, const char *file) {
