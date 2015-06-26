@@ -61,10 +61,10 @@ static void urn_time_string_format(char *string,
     } else if (delta) {
         sign = "+";
     }
-    hours = time / (1000000L * 60 * 60);
-    minutes = (time / (1000000L * 60)) % 60;
-    seconds = (time / 1000000L) % 60;
-    subseconds = (time % 1000000L) / 1000000.;
+    hours = time / (1000000LL * 60 * 60);
+    minutes = (time / (1000000LL * 60)) % 60;
+    seconds = (time / 1000000LL) % 60;
+    subseconds = (time % 1000000LL) / 1000000.;
     if (serialized) {
         sprintf(buf, "%.6f", subseconds);
     } else {
