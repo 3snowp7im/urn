@@ -1,6 +1,6 @@
 {
   "title": "SotN Any% NSC",
-  "attempt_count": 64,
+  "attempt_count": 69,
   "start_delay": "2.800000",
   "splits": [
     {
@@ -29,5 +29,5 @@
     }
   ],
   "width": 320,
-  "height": 240
+  "height": 300
 }

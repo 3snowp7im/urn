@@ -1,14 +1,19 @@
-BIN         := urn-gtk
-OBJS        := urn.o urn-gtk.o bind.o
-LIBS        := gtk+-3.0 x11 jansson
-CFLAGS      := `pkg-config --cflags $(LIBS)`
-LDLIBS      := `pkg-config --libs $(LIBS)`
-BIN_DIR     := /usr/local/bin
-APP         := urn.desktop
-APP_DIR     := /usr/share/applications
-ICON        := urn
-ICON_DIR    := /usr/share/icons/hicolor
-SCHEMAS_DIR := /usr/share/glib-2.0/schemas
+BIN         = urn-gtk
+OBJS        = urn.o urn-gtk.o bind.o $(COMPONENTS)
+COMPONENTS  = $(addprefix components/, \
+              urn-component.o title.o splits.o timer.o \
+              prev-segment.o best-sum.o pb.o wr.o)
+
+LIBS        = gtk+-3.0 x11 jansson
+CFLAGS      += `pkg-config --cflags $(LIBS)`
+LDLIBS      += `pkg-config --libs $(LIBS)`
+
+BIN_DIR     = /usr/local/bin
+APP         = urn.desktop
+APP_DIR     = /usr/share/applications
+ICON        = urn
+ICON_DIR    = /usr/share/icons/hicolor
+SCHEMAS_DIR = /usr/share/glib-2.0/schemas
 
 $(BIN): $(OBJS)
 

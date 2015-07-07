@@ -320,11 +320,7 @@ int urn_game_create(urn_game **game_ptr, const char *path) {
 void urn_game_update_splits(urn_game *game,
                             const urn_timer *timer) {
     if (timer->curr_split) {
-        int curr, size;
-        curr = timer->curr_split;
-        if (timer->curr_split > game->split_count) {
-            curr = game->split_count - 1;
-        }
+        int size;
         if (timer->split_times[game->split_count - 1]
             && timer->split_times[game->split_count - 1]
             < game->world_record) {
@@ -341,11 +337,7 @@ void urn_game_update_splits(urn_game *game,
 void urn_game_update_bests(urn_game *game,
                            const urn_timer *timer) {
     if (timer->curr_split) {
-        int curr, size;
-        curr = timer->curr_split;
-        if (timer->curr_split > game->split_count) {
-            curr = game->split_count - 1;
-        }
+        int size;
         size = timer->curr_split * sizeof(long long);
         memcpy(game->best_splits, timer->best_splits, size);
         memcpy(game->best_segments, timer->best_segments, size);
