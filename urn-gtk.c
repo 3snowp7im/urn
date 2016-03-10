@@ -38,6 +38,11 @@ typedef struct _UrnAppWindowClass    UrnAppWindowClass;
 
 #define WINDOW_PAD (8)
 
+typedef struct {
+    guint key;
+    GdkModifierType mods;
+} Keybind;
+
 struct _UrnAppWindow {
     GtkApplicationWindow parent;
     char data_path[256];
@@ -51,12 +56,12 @@ struct _UrnAppWindow {
     GtkCssProvider *style;
     gboolean hide_cursor;
     gboolean global_hotkeys;
-    const char *keybind_start_split;
-    const char *keybind_stop_reset;
-    const char *keybind_cancel;
-    const char *keybind_unsplit;
-    const char *keybind_skip_split;
-    const char *keybind_toggle_decorations;
+    Keybind keybind_start_split;
+    Keybind keybind_stop_reset;
+    Keybind keybind_cancel;
+    Keybind keybind_unsplit;
+    Keybind keybind_skip_split;
+    Keybind keybind_toggle_decorations;
 };
 
 struct _UrnAppWindowClass {
@@ -64,6 +69,17 @@ struct _UrnAppWindowClass {
 };
 
 G_DEFINE_TYPE(UrnAppWindow, urn_app_window, GTK_TYPE_APPLICATION_WINDOW);
+
+static Keybind parse_keybind(const gchar *accelerator) {
+    Keybind kb;
+    gtk_accelerator_parse(accelerator, &kb.key, &kb.mods);
+    return kb;
+}
+
+static int keybind_match(Keybind kb, GdkEventKey key) {
+    return key.keyval == kb.key &&
+        kb.mods == key.state & gtk_accelerator_get_default_mod_mask();
+}
 
 static void urn_app_window_destroy(GtkWidget *widget, gpointer data) {
     UrnAppWindow *win = (UrnAppWindow*)widget;
@@ -330,24 +346,18 @@ static gboolean urn_app_window_keypress(GtkWidget *widget,
                                         GdkEvent *event,
                                         gpointer data) {
     UrnAppWindow *win = (UrnAppWindow*)data;
-    const char *key;
-    key = gtk_accelerator_name_with_keycode(win->display,
-                                            event->key.keyval,
-                                            event->key.hardware_keycode,
-                                            0);
-    if (!strcmp(win->keybind_start_split, key)) {
+    if (keybind_match(win->keybind_start_split, event->key))
         timer_start_split(win);
-    } else if (!strcmp(win->keybind_stop_reset, key)) {
+    else if (keybind_match(win->keybind_stop_reset, event->key))
         timer_stop_reset(win);
-    } else if (!strcmp(win->keybind_cancel, key)) {
+    else if (keybind_match(win->keybind_cancel, event->key))
         timer_cancel_run(win);
-    } else if (!strcmp(win->keybind_unsplit, key)) {
+    else if (keybind_match(win->keybind_unsplit, event->key))
         timer_unsplit(win);
-    } else if (!strcmp(win->keybind_skip_split, key)) {
+    else if (keybind_match(win->keybind_skip_split, event->key))
         timer_skip(win);
-    } else if (!strcmp(win->keybind_toggle_decorations, key)) {
+    else if (keybind_match(win->keybind_toggle_decorations, event->key))
         toggle_decorations(win);
-    }
     return TRUE;
 }
 
@@ -390,18 +400,18 @@ static void urn_app_window_init(UrnAppWindow *win) {
     GSettings *settings = g_settings_new("wildmouse.urn");
     win->hide_cursor = g_settings_get_boolean(settings, "hide-cursor");
     win->global_hotkeys = g_settings_get_boolean(settings, "global-hotkeys");
-    win->keybind_start_split = g_settings_get_string(
-        settings, "keybind-start-split");
-    win->keybind_stop_reset = g_settings_get_string(
-        settings, "keybind-stop-reset");
-    win->keybind_cancel = g_settings_get_string(
-        settings, "keybind-cancel");
-    win->keybind_unsplit = g_settings_get_string(
-        settings, "keybind-unsplit");
-    win->keybind_skip_split = g_settings_get_string(
-        settings, "keybind-skip-split");
-    win->keybind_toggle_decorations = g_settings_get_string(
-        settings, "keybind-toggle-decorations");
+    win->keybind_start_split = parse_keybind(
+	g_settings_get_string(settings, "keybind-start-split"));
+    win->keybind_stop_reset = parse_keybind(
+	g_settings_get_string(settings, "keybind-stop-reset"));
+    win->keybind_cancel = parse_keybind(
+	g_settings_get_string(settings, "keybind-cancel"));
+    win->keybind_unsplit = parse_keybind(
+	g_settings_get_string(settings, "keybind-unsplit"));
+    win->keybind_skip_split = parse_keybind(
+	g_settings_get_string(settings, "keybind-skip-split"));
+    win->keybind_toggle_decorations = parse_keybind(
+	g_settings_get_string(settings, "keybind-toggle-decorations"));
     win->decorated = g_settings_get_boolean(settings, "start-decorated");
     gtk_window_set_decorated(GTK_WINDOW(win), win->decorated);
 
