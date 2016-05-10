@@ -78,7 +78,7 @@ static Keybind parse_keybind(const gchar *accelerator) {
 
 static int keybind_match(Keybind kb, GdkEventKey key) {
     return key.keyval == kb.key &&
-        kb.mods == key.state & gtk_accelerator_get_default_mod_mask();
+        kb.mods == (key.state & gtk_accelerator_get_default_mod_mask());
 }
 
 static void urn_app_window_destroy(GtkWidget *widget, gpointer data) {
