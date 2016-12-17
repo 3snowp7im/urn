@@ -52,8 +52,7 @@ static void urn_time_string_format(char *string,
                                    int delta,
                                    int compact) {
     int hours, minutes, seconds;
-    double subseconds;
-    char buf[256];
+    char dot_subsecs[256];
     const char *sign = "";
     if (time < 0) {
         time = -time;
@@ -64,32 +63,31 @@ static void urn_time_string_format(char *string,
     hours = time / (1000000LL * 60 * 60);
     minutes = (time / (1000000LL * 60)) % 60;
     seconds = (time / 1000000LL) % 60;
-    subseconds = (time % 1000000LL) / 1000000.;
-    if (serialized) {
-        sprintf(buf, "%.6f", subseconds);
-    } else {
-        sprintf(buf, "%.2f", subseconds);
+    sprintf(dot_subsecs, ".%06d", time % 1000000LL);
+    if (!serialized) {
+        /* Show only a dot and 2 decimal places instead of all 6 */
+        dot_subsecs[3] = '\0';
     }
     if (millis) {
-        strcpy(millis, &buf[2]);
-        buf[1] = '\0';
+        strcpy(millis, &dot_subsecs[1]);
+        dot_subsecs[0] = '\0';
     }
     if (hours) {
         if (!compact) {
             sprintf(string, "%s%d:%02d:%02d%s",
-                    sign, hours, minutes, seconds, &buf[1]);
+                    sign, hours, minutes, seconds, dot_subsecs);
         } else {
             sprintf(string, "%s%d:%02d", sign, hours, minutes);
         }
     } else if (minutes) {
         if (!compact) {
             sprintf(string, "%s%d:%02d%s",
-                    sign, minutes, seconds, &buf[1]);
+                    sign, minutes, seconds, dot_subsecs);
         } else {
             sprintf(string, "%s%d:%02d", sign, minutes, seconds);
         }
     } else {
-        sprintf(string, "%s%d%s", sign, seconds, &buf[1]);
+        sprintf(string, "%s%d%s", sign, seconds, dot_subsecs);
     }
 }
 
