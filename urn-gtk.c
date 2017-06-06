@@ -130,7 +130,7 @@ static gboolean urn_app_window_step(gpointer data) {
     if (win->hide_cursor && !set_cursor) {
         GdkWindow *gdk_window = gtk_widget_get_window(GTK_WIDGET(win));
         if (gdk_window) {
-            GdkCursor* cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
+            GdkCursor *cursor = gdk_cursor_new_for_display(win->display, GDK_BLANK_CURSOR);
             gdk_window_set_cursor(gdk_window, cursor);
             set_cursor = 1;
         }
