@@ -63,7 +63,7 @@ static void urn_time_string_format(char *string,
     hours = time / (1000000LL * 60 * 60);
     minutes = (time / (1000000LL * 60)) % 60;
     seconds = (time / 1000000LL) % 60;
-    sprintf(dot_subsecs, ".%06d", time % 1000000LL);
+    sprintf(dot_subsecs, ".%06lld", time % 1000000LL);
     if (!serialized) {
         /* Show only a dot and 2 decimal places instead of all 6 */
         dot_subsecs[3] = '\0';

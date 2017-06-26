@@ -18,7 +18,6 @@ extern UrnComponentOps urn_splits_operations;
 
 UrnComponent *urn_component_splits_new() {
     UrnSplits *self;
-    GdkRGBA color;
 
     self = malloc(sizeof(UrnSplits));
     if (!self) return NULL;
@@ -32,15 +31,6 @@ UrnComponent *urn_component_splits_new() {
     gtk_widget_show(self->split_scroller);
     gtk_widget_add_events(self->split_scroller, GDK_SCROLL_MASK);
 
-    // hide split scrollbar
-    gdk_rgba_parse(&color, "rgba(0,0,0,0)");
-    gtk_widget_override_background_color(
-        GTK_WIDGET(
-            gtk_scrolled_window_get_vscrollbar(
-                GTK_SCROLLED_WINDOW(self->split_scroller))),
-        GTK_STATE_NORMAL,
-        &color);
-    
     self->split_viewport = gtk_viewport_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(self->split_scroller),
             self->split_viewport);
@@ -275,7 +265,7 @@ static void splits_draw(UrnComponent *self_, urn_game *game, urn_timer *timer) {
             if (time_width) {
                 width = gtk_widget_get_allocated_width(
                     self->split_times[i]);
-                gtk_widget_set_margin_left(self->split_times[i],
+                gtk_widget_set_margin_start(self->split_times[i],
                     /*WINDOW_PAD*/ 8 * 2 + (time_width - width));
             }
         }

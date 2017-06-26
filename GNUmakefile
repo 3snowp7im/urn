@@ -5,7 +5,7 @@ COMPONENTS  = $(addprefix components/, \
               prev-segment.o best-sum.o pb.o wr.o)
 
 LIBS        = gtk+-3.0 x11 jansson
-CFLAGS      += `pkg-config --cflags $(LIBS)`
+CFLAGS      += `pkg-config --cflags $(LIBS)` -Wall -Wno-unused-parameter -std=gnu99
 LDLIBS      += `pkg-config --libs $(LIBS)`
 
 BIN_DIR     = /usr/local/bin

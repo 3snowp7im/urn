@@ -11,15 +11,6 @@
 #include "keybinder.h"
 #include "components/urn-component.h"
 
-// get rid of some annoying deprecation warnings
-// on the computers i compile this on
-#if GTK_CHECK_VERSION(3, 12, 0)
-#  define gtk_widget_set_margin_left            \
-    gtk_widget_set_margin_start
-#  define gtk_widget_set_margin_right           \
-    gtk_widget_set_margin_end
-#endif
-
 #define URN_APP_TYPE (urn_app_get_type ())
 #define URN_APP(obj)                            \
     (G_TYPE_CHECK_INSTANCE_CAST                 \
@@ -130,7 +121,7 @@ static gboolean urn_app_window_step(gpointer data) {
     if (win->hide_cursor && !set_cursor) {
         GdkWindow *gdk_window = gtk_widget_get_window(GTK_WIDGET(win));
         if (gdk_window) {
-            GdkCursor* cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
+            GdkCursor *cursor = gdk_cursor_new_for_display(win->display, GDK_BLANK_CURSOR);
             gdk_window_set_cursor(gdk_window, cursor);
             set_cursor = 1;
         }
@@ -497,8 +488,8 @@ static void urn_app_window_init(UrnAppWindow *win) {
         if (component) {
             GtkWidget *widget = component->ops->widget(component);
             if (widget) {
-                gtk_widget_set_margin_left(widget, WINDOW_PAD);
-                gtk_widget_set_margin_right(widget, WINDOW_PAD);
+                gtk_widget_set_margin_start(widget, WINDOW_PAD);
+                gtk_widget_set_margin_end(widget, WINDOW_PAD);
                 gtk_container_add(GTK_CONTAINER(win->box),
                         component->ops->widget(component));
             }
@@ -508,8 +499,8 @@ static void urn_app_window_init(UrnAppWindow *win) {
 
     win->footer = gtk_grid_new();
     add_class(win->footer, "footer");
-    gtk_widget_set_margin_left(win->footer, WINDOW_PAD);
-    gtk_widget_set_margin_right(win->footer, WINDOW_PAD);
+    gtk_widget_set_margin_start(win->footer, WINDOW_PAD);
+    gtk_widget_set_margin_end(win->footer, WINDOW_PAD);
     gtk_container_add(GTK_CONTAINER(win->box), win->footer);
     gtk_widget_show(win->footer);
 
