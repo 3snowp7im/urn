@@ -8,7 +8,7 @@
 long long urn_time_now(void) {
     struct timespec timespec;
     clock_gettime(CLOCK_MONOTONIC, &timespec);
-    return timespec.tv_sec * 1000000L + timespec.tv_nsec / 1000;
+    return timespec.tv_sec * 1000000LL + timespec.tv_nsec / 1000;
 }
 
 long long urn_time_value(const char *string) {
@@ -41,7 +41,7 @@ long long urn_time_value(const char *string) {
     }
     return sign * ((hours * 60 * 60
                     + minutes * 60
-                    + seconds) * 1000000L
+                    + seconds) * 1000000LL
                    + (int)(subseconds_part * 1000000.));
 }
 
