@@ -179,7 +179,7 @@ static void splits_clear_game(UrnComponent *self_) {
     self->split_count = 0;
 }
 
-#define SHOW_DELTA_THRESHOLD (-30 * 1000000L)
+#define SHOW_DELTA_THRESHOLD (-30 * 1000000LL)
 static void splits_draw(UrnComponent *self_, urn_game *game, urn_timer *timer) {
     UrnSplits *self = (UrnSplits *)self_;
     char str[256];
