@@ -8,7 +8,28 @@ It was originally written because there were no exisiting
 solutions for split tracking with a delayed start available
 on *nix platforms.
 
-Urn requires ```libgtk+-3.0```, ```x11``` and ```libjansson```.
+# Quick Start
+
+Urn requires ```libgtk+-3.0```, ```x11```, ```libjansson```.
+Installing Urn requires ```imagemagick```.
+
+On a Debian-based system, you can typically use these commands to
+compile, install, and run Urn:
+
+```
+sudo apt install build-essential libgtk-3-dev libjansson-dev imagemagick
+git clone https://github.com/3snowp7im/urn
+cd urn
+git submodule update --init
+make
+sudo make install
+/usr/local/bin/urn-gtk
+```
+
+Urn requires a well-formed JSON splits file to be used. You can either
+create this using the specifications below, edit the sample splits
+file provided in ```splits/sotn.json```, or download a splits file in
+Urn format from a web service like [splits.io](https://splits.io/).
 
 # Usage
 
@@ -76,6 +97,7 @@ The color of a time or delta has special meaning.
 * Must contain one main object
 * All keys are optional
 * Times are strings in HH:MM:SS.mmmmmm format
+* See ```splits/sotn.json``` for an example
 
 ## Main object
 
@@ -84,6 +106,7 @@ The color of a time or delta has special meaning.
 | title         | Title string at top of window         |
 | start_delay   | Non-negative delay until timer starts |
 | world_record  | Best known time                       |
+| attempt_count | Number of attempts                    |
 | splits        | Array of split objects                |
 | theme         | Window theme                          |
 | theme_variant | Window theme variant                  |
