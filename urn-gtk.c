@@ -550,7 +550,7 @@ G_DEFINE_TYPE(UrnApp, urn_app, GTK_TYPE_APPLICATION);
 static void open_activated(GSimpleAction *action,
                            GVariant      *parameter,
                            gpointer       app) {
-    char splits_path[256];
+    gchar *splits_folder;
     GList *windows;
     UrnAppWindow *win;
     GtkWidget *dialog;
@@ -568,22 +568,28 @@ static void open_activated(GSimpleAction *action,
         "_Cancel", GTK_RESPONSE_CANCEL,
         "_Open", GTK_RESPONSE_ACCEPT,
         NULL);
-
-    strcpy(splits_path, win->data_path);
-    strcat(splits_path, "/splits");
-    if (stat(splits_path, &st) == -1) {
-        mkdir(splits_path, 0700);
-    }
+    
+    GSettings *settings = g_settings_new("wildmouse.urn");
+    splits_folder = g_settings_get_string(settings, "splits-folder");
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),
-                                        splits_path);
+                                        splits_folder);
+    g_free(splits_folder);
 
     res = gtk_dialog_run(GTK_DIALOG(dialog));
     if (res == GTK_RESPONSE_ACCEPT) {
-        char *filename;
+        gchar *filename;
         GtkFileChooser *chooser = GTK_FILE_CHOOSER(dialog);
-        filename = gtk_file_chooser_get_filename(chooser);
-        urn_app_window_open(win, filename);
-        g_free(filename);
+	gchar *folder;
+
+	//open dialog in same folder next time
+	folder = gtk_file_chooser_get_current_folder(chooser);
+	gint res2 = g_settings_set_string(settings, "splits-folder", folder);
+	g_free(folder);
+	if (res2) {
+	  filename = gtk_file_chooser_get_filename(chooser);
+	  urn_app_window_open(win, filename);
+	  g_free(filename);
+	}
     }
     gtk_widget_destroy(dialog);
 }

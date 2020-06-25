@@ -56,5 +56,10 @@
       <summary>Toggle window decorations keybind</summary>
       <description>Key for toggling window decorations.</description>
     </key>
+    <key name="splits-folder" type="s">
+      <default>'~/.urn'</default>
+      <summary>Splits folder</summary>
+      <description>When choosing a splits file, file dialog starts in this folder (auto-updated to last folder you used)</description>
+    </key>
   </schema>
 </schemalist>
