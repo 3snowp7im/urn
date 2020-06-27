@@ -554,7 +554,6 @@ static void open_activated(GSimpleAction *action,
     GList *windows;
     UrnAppWindow *win;
     GtkWidget *dialog;
-    struct stat st = {0};
     gint res;
 
     windows = gtk_application_get_windows(GTK_APPLICATION(app));

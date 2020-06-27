@@ -73,6 +73,15 @@ static GSList *bindings = NULL;
 static guint32 last_event_time = 0;
 static gboolean processing_event = FALSE;
 
+static GdkKeymap *
+getKeymap() {
+	GdkWindow *rootwin = gdk_get_default_root_window ();
+	GdkDisplay *display = gdk_window_get_display(rootwin);
+	GdkKeymap *keymap = gdk_keymap_get_for_display(display);
+
+	return keymap;
+}
+
 /* Return the modifier mask that needs to be pressed to produce key in the
  * given group (keyboard layout) and level ("shift level").
  */
@@ -136,6 +145,7 @@ grab_ungrab_with_ignorable_modifiers (GdkWindow *rootwin,
 {
 	guint i;
 	gboolean success = FALSE;
+	GdkDisplay *display = gdk_window_get_display(rootwin);
 
 	/* Ignorable modifiers */
 	guint mod_masks [] = {
@@ -145,7 +155,7 @@ grab_ungrab_with_ignorable_modifiers (GdkWindow *rootwin,
 		GDK_MOD2_MASK | GDK_LOCK_MASK,
 	};
 
-	gdk_error_trap_push ();
+	gdk_x11_display_error_trap_push (display);
 
 	for (i = 0; i < G_N_ELEMENTS (mod_masks); i++) {
 		if (grab) {
@@ -163,8 +173,8 @@ grab_ungrab_with_ignorable_modifiers (GdkWindow *rootwin,
 			            GDK_WINDOW_XID (rootwin));
 		}
 	}
-	gdk_flush();
-	if (gdk_error_trap_pop()) {
+	gdk_display_flush(display);
+	if (gdk_x11_display_error_trap_pop(display)) {
 		TRACE (g_warning ("Failed grab/ungrab"));
 		if (grab) {
 			/* On error, immediately release keys again */
@@ -201,7 +211,7 @@ grab_ungrab (GdkWindow *rootwin,
 	                 XkbAllClientInfoMask,
 	                 XkbUseCoreKbd);
 
-	map = gdk_keymap_get_default();
+	map = getKeymap();
 	gdk_keymap_get_entries_for_keyval(map, keyval, &keys, &n_keys);
 
 	if (n_keys == 0)
@@ -281,7 +291,7 @@ do_grab_key (struct Binding *binding)
 {
 	gboolean success;
 	GdkWindow *rootwin = gdk_get_default_root_window ();
-	GdkKeymap *keymap = gdk_keymap_get_default ();
+	GdkKeymap *keymap = getKeymap ();
 
 
 	GdkModifierType modifiers;
@@ -321,7 +331,7 @@ do_grab_key (struct Binding *binding)
 static gboolean
 do_ungrab_key (struct Binding *binding)
 {
-	GdkKeymap *keymap = gdk_keymap_get_default ();
+	GdkKeymap *keymap = getKeymap ();
 	GdkWindow *rootwin = gdk_get_default_root_window ();
 	GdkModifierType modifiers;
 
@@ -343,7 +353,7 @@ static GdkFilterReturn
 filter_func (GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
 {
 	XEvent *xevent = (XEvent *) gdk_xevent;
-	GdkKeymap *keymap = gdk_keymap_get_default();
+	GdkKeymap *keymap = getKeymap();
 	guint keyval;
 	GdkModifierType consumed, modifiers;
 	guint mod_mask = gtk_accelerator_get_default_mod_mask();
@@ -449,7 +459,7 @@ keymap_changed (GdkKeymap *map)
 void
 keybinder_init ()
 {
-	GdkKeymap *keymap = gdk_keymap_get_default ();
+	GdkKeymap *keymap = getKeymap ();
 	GdkWindow *rootwin = gdk_get_default_root_window ();
 
 	gdk_window_add_filter (rootwin, filter_func, rootwin);
