@@ -23,14 +23,15 @@ urn-gtk.h: urn-gtk.css
 	xxd --include urn-gtk.css > urn-gtk.h || (rm urn-gtk.h; false)
 
 install:
-	cp $(BIN) $(BIN_DIR)
-	cp $(APP) $(APP_DIR)
+	install -Dm755 $(BIN) $(BIN_DIR)/$(BIN)
+	install -Dm644 $(APP) $(APP_DIR)/$(APP)
 	for size in 16 22 24 32 36 48 64 72 96 128 256 512; do \
+	  mkdir -p $(ICON_DIR)/"$$size"x"$$size"/apps ; \
 	  convert $(ICON).svg -resize "$$size"x"$$size" \
 	          $(ICON_DIR)/"$$size"x"$$size"/apps/$(ICON).png ; \
 	done
 	gtk-update-icon-cache -f -t $(ICON_DIR)
-	cp urn-gtk.gschema.xml $(SCHEMAS_DIR)
+	install -Dm644 urn-gtk.gschema.xml $(SCHEMAS_DIR)/urn-gtk.gschema.xml
 	glib-compile-schemas $(SCHEMAS_DIR)
 	mkdir -p /usr/share/urn/themes
 	rsync -a --exclude=".*" themes /usr/share/urn
