@@ -7,12 +7,12 @@
       <description>Start with window decorations.</description>
     </key>
     <key name="hide-cursor" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>Hide cursor</summary>
       <description>Hides the cursor when it hovers over the window.</description>
     </key>
     <key name="theme" type="s">
-      <default>'standard'</default>
+      <default>''</default>
       <summary>Theme</summary>
       <description>Window theme.</description>
     </key>
@@ -52,7 +52,7 @@
       <description>Key for skipping the current split.</description>
     </key>
     <key name="keybind-toggle-decorations" type="s">
-      <default>'Control_R'</default>
+      <default>'&lt;Control&gt;r'</default>
       <summary>Toggle window decorations keybind</summary>
       <description>Key for toggling window decorations.</description>
     </key>
