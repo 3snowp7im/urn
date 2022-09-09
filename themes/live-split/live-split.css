@@ -1,0 +1,122 @@
+.window {
+	color: #fff;
+  background: #000;
+}
+.header {
+  color: #fff;
+  background: linear-gradient(#1b1b1b, #000);
+  padding-right: 8px;
+  margin: -8px;
+}
+.title, .attempt-count {
+  padding-top: 4px;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.attempt-count {
+	color: #818181;
+}
+.splits {
+	font-size: 14px;
+  font-family: sans-serif;
+  text-shadow: 0px 1px 1px rgba(0,0,0,0.1);
+}
+.split, .split-last {
+  min-height: 20px;
+  border-bottom: 1px solid rgba(46, 46, 46, 0.35);
+}
+.split:nth-child(even) {
+  background-color: #0f0f0f;
+}
+.split:nth-child(even).current-split {
+  background-color: rgba(127, 127, 255, 0.3);
+}
+.split .split-time {
+  font-weight: normal;
+  font-family: sans-serif;
+}
+.current-split {
+  background-color: rgba(127, 127, 255, 0.3);
+}
+.current-split .split-time {
+  background: transparent;
+}
+.split .split-time .done {
+  color: #fff;
+  font-weight: 400;
+}
+.split, .current-split, .split-title, .split-time, .split-delta, .split-last {
+  padding: 2px 4px;
+}
+
+.time {
+  color: #fff;
+  font-weight: bold;
+}
+
+.delta {
+  background: transparent;
+  font-weight: 600;
+  color: #4CAF50;
+}
+.best-split, .footer .previous-segment .best-split {
+  animation: blink-split 4s;
+  animation-iteration-count: infinite;
+  background-color: transparent;
+}
+
+.timer {
+  text-shadow: 0px 2px 3px rgba(0,0,0,0.65);
+  color: #4CAF50;
+}
+.timer-millis {
+  font-size: 26pt;
+  padding-bottom: 5px;
+  padding-right: 4px;
+}
+.timer-seconds {
+  font-size: 40pt;
+}
+
+.losing {
+  color: #4CAF50;
+}
+.behind {
+  color: #F44336;
+}
+.footer {
+  color: #555;
+}
+
+.split-last {
+  color: #777;
+  border-top: 1px solid #000;
+}
+.split-last .split-time {
+  color: #99a;
+}
+.footer {
+  padding-right: 0 0;
+  background: linear-gradient(#111111, #000);
+  margin: 0 -8px;
+}
+
+.prev-segment-label,
+.prev-segment,
+.sum-of-bests-label,
+.sum-of-bests,
+.personal-best-label,
+.personal-best,
+.world-record-label,
+.world-record {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.sum-of-bests, .sum-of-bests-label {
+  font-size: 0;
+}
+.personal-best, .personal-best-label {
+  font-size: 0;
+}
