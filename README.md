@@ -1,19 +1,48 @@
-![Urn](http://i.imgur.com/T6cknpk.png)
+# Urn split tracker
 ![Urn](http://i.imgur.com/1ivi9EZ.png)
 
-# About
+## About
 
-This simple split tracker was hacked together by 3snow p7im.
-It was originally written because there were no exisiting
+This simple split tracker was hacked together by [3snow p7im](https://github.com/3snowp7im).
+It was originally written because there were no existing
 solutions for split tracking with a delayed start available
 on *nix platforms.
 
-Urn requires ```libgtk+-3.0```, ```x11``` and ```libjansson```.
+Forked from the original project (rest in peace), the goal of
+this fork is to add some minor fixes and implement its pull requests.
 
-# Usage
+## Quick start
 
-Initially the window is undecorated. You can toggle window decorations
-by pressing right ```Control```.
+Urn requires `libgtk+-3.0`, `x11`, `libjansson`
+and installing requires `imagemagick`, and `rsync`.
+
+On Debian-based systems:
+```sh
+sudo apt update
+sudo apt install libgtk-3-dev build-essential libjansson-dev imagemagick rsync
+```
+
+Clone the project:
+```sh
+git clone https://github.com/leflores-fisi/urn
+cd urn
+```
+
+Now compile and install **Urn** (see details in `./GNUmakefile`)
+```sh
+make
+sudo make install
+```
+
+All ready! Now start the desktop **Urn** application or run `/usr/local/bin/urn-gtk`.
+
+## Usage
+
+When you start the **Urn** application, a file dialog will appear to select
+a Split JSON file (see [Split files](#split-files)).
+
+Initially, the window is undecorated. You can toggle window decorations
+by pressing `Control R`.
 
 The timer is controlled by key presses:
 
@@ -25,7 +54,7 @@ The timer is controlled by key presses:
 
 Cancel will reset the timer and decrement the attempt counter.
 A run that is reset before the start delay is automatically
-cancelled. If you forgot to split, or accidentally split twice,
+canceled. If you forgot to split, or accidentally split twice,
 you can manually change the current split:
 
 | Key       | Action      |
@@ -35,10 +64,10 @@ you can manually change the current split:
 
 Keybinds can be configured by changing your gsettings.
 
-# Settings
+## Settings 
 
-Currently there is no settings dialog, but you can change
-the values in ```wildmouse.urn``` path with ```gsettings```.
+There is no settings dialog, but you can change
+the values in the `wildmouse.urn` path with `gsettings`.
 
 | Key                        | Type    | Description                       |
 |----------------------------|---------|-----------------------------------|
@@ -57,9 +86,9 @@ the values in ```wildmouse.urn``` path with ```gsettings```.
 Keybind strings should be parseable by
 [gtk_accelerator_parse](https://developer.gnome.org/gtk3/stable/gtk3-Keyboard-Accelerators.html#gtk-accelerator-parse).
 
-# Color Key
+## Color Key
 
-The color of a time or delta has special meaning.
+The color of a time or delta has a special meaning.
 
 | Color       | Meaning                                |
 |-------------|----------------------------------------|
@@ -70,18 +99,21 @@ The color of a time or delta has special meaning.
 | Blue        | Best split time in any run             |
 | Gold        | Best segment time in any run           |
 
-# Split Files
+## Split Files
 
-* Stored as well-formed json
-* Must contain one main object
-* All keys are optional
-* Times are strings in HH:MM:SS.mmmmmm format
+Split files are stored as well-formed JSON and **must** contain
+one [main object](#main-object). All the keys are optional.
 
-## Main object
+You can use [`splits/sotn.json`](https://github.com/leflores-fisi/urn/blob/master/splits/sotn.json)
+as an example or create your own split files and place them
+wherever you want.
+
+### Main object
 
 | Key           | Value                                 |
 |---------------|---------------------------------------|
 | title         | Title string at top of window         |
+| attempt_count | Number of attempts                    |
 | start_delay   | Non-negative delay until timer starts |
 | world_record  | Best known time                       |
 | splits        | Array of split objects                |
@@ -90,7 +122,7 @@ The color of a time or delta has special meaning.
 | width         | Window width                          |
 | height        | Window height                         |
 
-## Split object
+### Split object
 
 | Key          | Value                  |
 |--------------|------------------------|
@@ -99,20 +131,26 @@ The color of a time or delta has special meaning.
 | best_time    | Your best split time   |
 | best_segment | Your best segment time |
 
-# Themes
+Times are strings in HH:MM:SS.mmmmmm format
+
+## Themes
 
 Create a theme stylesheet and place it
-in ```~/.urn/themes/<name>/<name>.css``` where ```name```
-is the name of your theme. You can set the global theme by
-changing the ```theme``` value in gsettings. Theme variants
-should follow the pattern ```<name>-<variant>.css```.
+in `themes/<name>/<name>.css` or directly in `~/.urn/themes/<name>/<name>.css`, where `name` is the name of your theme.
+
+You can set the global theme by
+changing the `theme` value in gsettings. Theme variants
+should follow the pattern `<name>-<variant>.css`.
 Your splits can apply their own themes by specifying
-a ```theme``` key in the main object.
+a `theme` key in the main object.
+
+See [this project](https://github.com/TheBlackParrot/urn-themes) for
+a list of ready-to-use themes.
 
 For a list of supported CSS properties, see
 [GtkCssProvider](https://developer.gnome.org/gtk3/stable/GtkCssProvider.html).
 
-| Class                   |
+| Urn CSS classes         |
 |-------------------------|
 | .window                 |
 | .header                 |
@@ -137,8 +175,8 @@ For a list of supported CSS properties, see
 | .best-segment           |
 | .best-split             |
 | .footer                 |
-| .prev-segment-label |
-| .prev-segment       |
+| .prev-segment-label     |
+| .prev-segment           |
 | .sum-of-bests-label     |
 | .sum-of-bests           |
 | .personal-best-label    |
@@ -146,9 +184,15 @@ For a list of supported CSS properties, see
 | .world-record-label     |
 | .world-record           |
 
-If a split has a ```title``` key, its UI element receives a class
+If a split has a `title` key, its UI element receives a class
 name derived from its title. Specifically, the title is lowercased
 and all non-alphanumeric characters are replaced with hyphens, and
-the result is concatenated with ```split-title-```. For instance,
+the result is concatenated with `split-title-`. For instance,
 if your split is titled "First split", it can be styled by
-targeting the CSS class ```.split-title-first-split```.
+targeting the CSS class `.split-title-first-split`.
+
+## Uninstall Urn
+Uninstall the desktop application by running
+```sh
+sudo make uninstall
+```
