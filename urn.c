@@ -427,6 +427,7 @@ static void reset_timer(urn_timer *timer) {
     timer->started = 0;
     timer->start_time = 0;
     timer->curr_split = 0;
+    timer->last_paused_stamp = 0;
     timer->time = -timer->game->start_delay;
     size = timer->game->split_count * sizeof(long long);
     memcpy(timer->split_times, timer->game->split_times, size);
@@ -576,6 +577,12 @@ int urn_timer_start(urn_timer *timer) {
             timer->started = 1;
         }
         timer->running = 1;
+        // if was paused before, add in-pause time to start time
+        // so the timer properly resumes
+        if (timer->last_paused_stamp) {
+            timer->start_time += timer->now - timer->last_paused_stamp;
+        }
+        timer->last_paused_stamp = 0;
     }
     return timer->running;
 }
@@ -658,6 +665,7 @@ int urn_timer_unsplit(urn_timer *timer) {
 
 void urn_timer_stop(urn_timer *timer) {
     timer->running = 0;
+    timer->last_paused_stamp = urn_time_now();
 }
 
 int urn_timer_reset(urn_timer *timer) {

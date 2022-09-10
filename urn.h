@@ -42,7 +42,8 @@ struct urn_timer {
     long long *best_splits;
     long long *best_segments;
     const urn_game *game;
-  int *attempt_count;
+    int *attempt_count;
+    long long last_paused_stamp;
 };
 typedef struct urn_timer urn_timer;
 
