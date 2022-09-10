@@ -30,6 +30,7 @@ struct urn_timer {
     int running;
     long long now;
     long long start_time;
+    long long last_paused_stamp;
     long long time;
     long long sum_of_bests;
     long long world_record;
@@ -43,7 +44,6 @@ struct urn_timer {
     long long *best_segments;
     const urn_game *game;
     int *attempt_count;
-    long long last_paused_stamp;
 };
 typedef struct urn_timer urn_timer;
 

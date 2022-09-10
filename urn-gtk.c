@@ -228,12 +228,13 @@ static gboolean urn_app_window_resize(GtkWidget *widget,
 static void timer_start_split(UrnAppWindow *win) {
     if (win->timer) {
         GList *l;
-        if (!win->timer->running) {
+        if (win->timer->running) {
+            urn_timer_split(win->timer);
+        }
+        else {
             if (urn_timer_start(win->timer)) {
                 save_game(win->game);
             }
-        } else {
-            urn_timer_split(win->timer);
         }
         for (l = win->components; l != NULL; l = l->next) {
             UrnComponent *component = l->data;
@@ -554,7 +555,6 @@ static void open_activated(GSimpleAction *action,
     GList *windows;
     UrnAppWindow *win;
     GtkWidget *dialog;
-    struct stat st = {0};
     gint res;
     windows = gtk_application_get_windows(GTK_APPLICATION(app));
     if (windows) {
