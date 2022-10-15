@@ -412,6 +412,11 @@ static void urn_app_window_init(UrnAppWindow *win) {
     strcpy(win->data_path, pw->pw_dir);
     strcat(win->data_path, "/.urn");
 
+    // load icon
+    gtk_window_set_icon(GTK_WINDOW(win), gdk_pixbuf_new_from_file(
+        "/usr/share/icons/hicolor/256x256/apps/urn.png", NULL
+    ));
+
     // load settings
     GSettings *settings = g_settings_new("wildmouse.urn");
     win->keybind_start_split = parse_keybind(
