@@ -52,7 +52,7 @@
       <description>Key for skipping the current split.</description>
     </key>
     <key name="keybind-toggle-decorations" type="s">
-      <default>'&lt;Control&gt;r'</default>
+      <default>'Control_R'</default>
       <summary>Toggle window decorations keybind</summary>
       <description>Key for toggling window decorations.</description>
     </key>

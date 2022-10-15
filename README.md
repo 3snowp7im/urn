@@ -42,7 +42,8 @@ When you start the **Urn** application, a file dialog will appear to select
 a Split JSON file (see [Split files](#split-files)).
 
 Initially, the window is undecorated. You can toggle window decorations
-by pressing `Control R`.
+by pressing the `Right Control` key.
+
 
 The timer is controlled by key presses:
 
