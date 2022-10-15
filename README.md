@@ -28,7 +28,7 @@ git clone https://github.com/leflores-fisi/urn
 cd urn
 ```
 
-Now compile and install **Urn** (see details in `./GNUmakefile`)
+Now compile and install **Urn** (see details in the [Makefile](https://github.com/leflores-fisi/urn/blob/master/Makefile))
 ```sh
 make
 sudo make install
