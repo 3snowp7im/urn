@@ -37,7 +37,8 @@ typedef struct {
 struct _UrnAppWindow {
     GtkApplicationWindow parent;
     char data_path[256];
-    int decorated;
+    gboolean decorated;
+    gboolean win_on_top;
     urn_game *game;
     urn_timer *timer;
     GdkDisplay *display;
@@ -53,6 +54,7 @@ struct _UrnAppWindow {
     Keybind keybind_unsplit;
     Keybind keybind_skip_split;
     Keybind keybind_toggle_decorations;
+    Keybind keybind_toggle_win_on_top;
 };
 
 struct _UrnAppWindowClass {
@@ -310,6 +312,11 @@ static void toggle_decorations(UrnAppWindow *win) {
     win->decorated = !win->decorated;
 }
 
+static void toggle_win_on_top(UrnAppWindow *win) {
+    gtk_window_set_keep_above(GTK_WINDOW(win), !win->win_on_top);
+    win->win_on_top = !win->win_on_top;
+}
+
 static void keybind_start_split(GtkWidget *widget, UrnAppWindow *win) {
     timer_start_split(win);
 }
@@ -334,6 +341,10 @@ static void keybind_toggle_decorations(const char *str, UrnAppWindow *win) {
     toggle_decorations(win);
 }
 
+static void keybind_toggle_win_on_top(const char *str, UrnAppWindow *win) {
+    toggle_win_on_top(win);
+}
+
 static gboolean urn_app_window_keypress(GtkWidget *widget,
                                         GdkEvent *event,
                                         gpointer data) {
@@ -350,6 +361,8 @@ static gboolean urn_app_window_keypress(GtkWidget *widget,
         timer_skip(win);
     else if (keybind_match(win->keybind_toggle_decorations, event->key))
         toggle_decorations(win);
+    else if (keybind_match(win->keybind_toggle_win_on_top, event->key))
+        toggle_win_on_top(win);
     return TRUE;
 }
 
@@ -406,6 +419,10 @@ static void urn_app_window_init(UrnAppWindow *win) {
 	g_settings_get_string(settings, "keybind-toggle-decorations"));
     win->decorated = g_settings_get_boolean(settings, "start-decorated");
     gtk_window_set_decorated(GTK_WINDOW(win), win->decorated);
+    win->keybind_toggle_win_on_top = parse_keybind(
+    g_settings_get_string(settings, "keybind-toggle-win-on-top"));
+    win->win_on_top = g_settings_get_boolean(settings, "start-on-top");
+    gtk_window_set_keep_above(GTK_WINDOW(win), win->win_on_top);
 
     // Load CSS defaults
     provider = gtk_css_provider_new();
@@ -470,6 +487,10 @@ static void urn_app_window_init(UrnAppWindow *win) {
         keybinder_bind(
             g_settings_get_string(settings, "keybind-toggle-decorations"),
             (KeybinderHandler)keybind_toggle_decorations,
+            win);
+        keybinder_bind(
+            g_settings_get_string(settings, "keybind-toggle-win-on-top"),
+            (KeybinderHandler)keybind_toggle_win_on_top,
             win);
     } else {
         g_signal_connect(win, "key_press_event",

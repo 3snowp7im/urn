@@ -68,21 +68,23 @@ Keybinds can be configured by changing your gsettings.
 ## Settings 
 
 There is no settings dialog, but you can change
-the values in the `wildmouse.urn` path with `gsettings`.
+the values in the `wildmouse.urn` path with `gsettings` or directly
+change them in the `urn-gtk.gschema.xml` file.
 
-| Key                        | Type    | Description                       |
-|----------------------------|---------|-----------------------------------|
-| start-decorated            | Boolean | Start with window decorations     |
-| hide-cursor                | Boolean | Hide cursor in window             |
-| global-hotkeys             | Boolean | Enables global hotkeys            |
-| theme                      | String  | Default theme name                |
-| theme-variant              | String  | Default theme variant             |
-| keybind-start-split        | String  | Start/split keybind               |
-| keybind-stop-reset         | String  | Stop/Reset keybind                |
-| keybind-cancel             | String  | Cancel keybind                    |
-| keybind-unsplit            | String  | Unsplit keybind                   |
-| keybind-skip-split         | String  | Skip split keybind                |
-| keybind-toggle-decorations | String  | Toggle window decorations keybind |
+| Key                        | Type    | Description                        |
+|----------------------------|---------|------------------------------------|
+| start-decorated            | Boolean | Start with window decorations      |
+| start-on-top               | Boolean | Start with window as always on top |
+| hide-cursor                | Boolean | Hide cursor in window              |
+| global-hotkeys             | Boolean | Enables global hotkeys             |
+| theme                      | String  | Default theme name                 |
+| theme-variant              | String  | Default theme variant              |
+| keybind-start-split        | String  | Start/split keybind                |
+| keybind-stop-reset         | String  | Stop/Reset keybind                 |
+| keybind-cancel             | String  | Cancel keybind                     |
+| keybind-unsplit            | String  | Unsplit keybind                    |
+| keybind-skip-split         | String  | Skip split keybind                 |
+| keybind-toggle-decorations | String  | Toggle window decorations keybind  |
 
 Keybind strings should be parseable by
 [gtk_accelerator_parse](https://developer.gnome.org/gtk3/stable/gtk3-Keyboard-Accelerators.html#gtk-accelerator-parse).
