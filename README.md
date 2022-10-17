@@ -20,15 +20,15 @@ on *nix platforms.
 
 **Forked** from the [original project](https://github.com/3snowp7im/urn) (rest in peace).
 
-Features added:
-- Now the last split folder is saved (by [@Thue](https://github.com/Thue))
+### Features added:
+- Now the last split folder is saved ([pull request by @Thue](https://github.com/3snowp7im/urn/pull/49))
 - New default theme (LiveSplit theme)
-- New shortcut to keep window always on top (Ctrl K)
+- New shortcut to keep window always on top (Ctrl+K)
 - More friendly README.md
 - Nicer time format
 - New Urn icon ✨
 
-Bugs fixed:
+### Bugs fixed:
 - Timer kept running in the background while paused
 - User was able to skip the last split
 
@@ -72,47 +72,55 @@ The timer is controlled by key presses:
 
 | Key        | Stopped | Started |
 |------------|---------|---------|
-| Spacebar   | Start   | Split   |
-| Backspace  | Reset   | Stop    |
-| Delete     | Cancel  | -       |
+| <kbd>Spacebar</kbd>   | Start   | Split   |
+| <kbd>Backspace</kbd>  | Reset   | Stop    |
+| <kbd>Delete</kbd>     | Cancel  | -       |
 
-Cancel will reset the timer and decrement the attempt counter.
-A run that is reset before the start delay is automatically
-canceled. If you forgot to split, or accidentally split twice,
+Cancel will **reset the timer** and **decrement the attempt counter**. A run that is reset before the [start delay](#main-object) is automatically
+canceled.
+
+If you forgot to split, or accidentally split twice,
 you can manually change the current split:
 
 | Key       | Action      |
 |-----------|-------------|
-| Page Up   | Unsplit     |
-| Page Down | Skip split  |
+| <kbd>Page Up</kbd>   | Unsplit     |
+| <kbd>Page Down</kbd> | Skip split  |
 
 Keybinds can be configured by changing your gsettings.
 
-## Settings 
+## Settings and keybinds
+
+See the [urn-gtk.gschema.xml](https://github.com/leflores-fisi/urn/blob/master/urn-gtk.gschema.xml) file.
+
+| Setting                      | Type    | Description                        | Default |
+|------------------------------|---------|------------------------------------|---------|
+| `start-decorated`            | Boolean | Start with window decorations      | false   |
+| `start-on-top`               | Boolean | Start with window as always on top | true    |
+| `hide-cursor`                | Boolean | Hide cursor in window              | false   |
+| `global-hotkeys`             | Boolean | Enables global hotkeys             | false   |
+| `theme`                      | String  | Default theme name                 | ''      |
+| `theme-variant`              | String  | Default theme variant              | ''      |
+
+| Keybind                      |         |                                    | Default |
+|------------------------------|---------|------------------------------------|---------|
+| `keybind-start-split`        | String  | Start/split keybind                | <kbd>space</kbd>
+| `keybind-stop-reset`         | String  | Stop/Reset keybind                 | <kbd>BackSpace</kbd>
+| `keybind-cancel`             | String  | Cancel keybind                     | <kbd>Delete</kbd>
+| `keybind-unsplit`            | String  | Unsplit keybind                    | <kbd>Page_Up</kbd>
+| `keybind-skip-split`         | String  | Skip split keybind                 | <kbd>Page_Down</kbd>
+| `keybind-toggle-decorations` | String  | Toggle window decorations keybind  | <kbd>Ctrl_R</kbd> (rigth)
+
+### Modifying the default values
 
 There is no settings dialog, but you can change
 the values in the `wildmouse.urn` path with `gsettings` or directly
-change them in the `urn-gtk.gschema.xml` file.
+edit them in the [urn-gtk.gschema.xml](https://github.com/leflores-fisi/urn/blob/master/urn-gtk.gschema.xml) file and recompile.
 
-| Key                        | Type    | Description                        |
-|----------------------------|---------|------------------------------------|
-| start-decorated            | Boolean | Start with window decorations      |
-| start-on-top               | Boolean | Start with window as always on top |
-| hide-cursor                | Boolean | Hide cursor in window              |
-| global-hotkeys             | Boolean | Enables global hotkeys             |
-| theme                      | String  | Default theme name                 |
-| theme-variant              | String  | Default theme variant              |
-| keybind-start-split        | String  | Start/split keybind                |
-| keybind-stop-reset         | String  | Stop/Reset keybind                 |
-| keybind-cancel             | String  | Cancel keybind                     |
-| keybind-unsplit            | String  | Unsplit keybind                    |
-| keybind-skip-split         | String  | Skip split keybind                 |
-| keybind-toggle-decorations | String  | Toggle window decorations keybind  |
+Keybind strings must be parseable by the
+[gtk_accelerator_parse](https://docs.gtk.org/gtk4/func.accelerator_parse.html).
 
-Keybind strings should be parseable by
-[gtk_accelerator_parse](https://developer.gnome.org/gtk3/stable/gtk3-Keyboard-Accelerators.html#gtk-accelerator-parse).
-
-## Color Key
+## Colors
 
 The color of a time or delta has a special meaning.
 
@@ -136,28 +144,28 @@ wherever you want.
 
 ### Main object
 
-| Key           | Value                                 |
-|---------------|---------------------------------------|
-| title         | Title string at top of window         |
-| attempt_count | Number of attempts                    |
-| start_delay   | Non-negative delay until timer starts |
-| world_record  | Best known time                       |
-| splits        | Array of split objects                |
-| theme         | Window theme                          |
-| theme_variant | Window theme variant                  |
-| width         | Window width                          |
-| height        | Window height                         |
+| Key           | Value                                  |
+|---------------|----------------------------------------|
+| `title`         | Title string at top of window          |
+| `attempt_count` | Number of attempts                     |
+| `start_delay`   | Non-negative delay until timer starts  |
+| `world_record`  | Best known time                        |
+| `splits`        | Array of [split objects](#split-object)|
+| `theme`         | Window theme                           |
+| `theme_variant` | Window theme variant                   |
+| `width`         | Window width                           |
+| `height`        | Window height                          |
 
 ### Split object
 
 | Key          | Value                  |
 |--------------|------------------------|
-| title        | Split title            |
-| time         | Split time             |
-| best_time    | Your best split time   |
-| best_segment | Your best segment time |
+| `title`        | Split title            |
+| `time`         | Split time             |
+| `best_time`    | Your best split time   |
+| `best_segment` | Your best segment time |
 
-Times are strings in HH:MM:SS.mmmmmm format
+Times are strings in `HH:MM:SS.mmmmmm` format.
 
 ## Themes
 
@@ -173,42 +181,41 @@ a `theme` key in the main object.
 See [this project](https://github.com/TheBlackParrot/urn-themes) for
 a list of ready-to-use themes.
 
-For a list of supported CSS properties, see
-[GtkCssProvider](https://developer.gnome.org/gtk3/stable/GtkCssProvider.html).
+See the [GtkCssProvider](https://docs.gtk.org/gtk3/class.CssProvider.html) docs for a list of supported CSS properties.
 
 | Urn CSS classes         |
 |-------------------------|
-| .window                 |
-| .header                 |
-| .title                  |
-| .attempt-count          |
-| .time                   |
-| .delta                  |
-| .timer                  |
-| .timer-seconds          |
-| .timer-millis           |
-| .delay                  |
-| .splits                 |
-| .split                  |
-| .current-split          |
-| .split-title            |
-| .split-time             |
-| .split-delta            | 
-| .split-last             |
-| .done                   |
-| .behind                 |
-| .losing                 |
-| .best-segment           |
-| .best-split             |
-| .footer                 |
-| .prev-segment-label     |
-| .prev-segment           |
-| .sum-of-bests-label     |
-| .sum-of-bests           |
-| .personal-best-label    |
-| .personal-best          |
-| .world-record-label     |
-| .world-record           |
+| `.window`                 |
+| `.header`                 |
+| `.title`                  |
+| `.attempt-count`          |
+| `.time`                   |
+| `.delta`                  |
+| `.timer`                  |
+| `.timer-seconds`          |
+| `.timer-millis`           |
+| `.delay`                  |
+| `.splits`                 |
+| `.split`                  |
+| `.current-split`          |
+| `.split-title`            |
+| `.split-time`             |
+| `.split-delta`            | 
+| `.split-last`             |
+| `.done`                   |
+| `.behind`                 |
+| `.losing`                 |
+| `.best-segment`           |
+| `.best-split`             |
+| `.footer`                 |
+| `.prev-segment-label`     |
+| `.prev-segment`           |
+| `.sum-of-bests-label`     |
+| `.sum-of-bests`           |
+| `.personal-best-label`    |
+| `.personal-best`          |
+| `.world-record-label`     |
+| `.world-record`           |
 
 If a split has a `title` key, its UI element receives a class
 name derived from its title. Specifically, the title is lowercased
@@ -216,6 +223,38 @@ and all non-alphanumeric characters are replaced with hyphens, and
 the result is concatenated with `split-title-`. For instance,
 if your split is titled "First split", it can be styled by
 targeting the CSS class `.split-title-first-split`.
+
+---
+
+## FAQ
+- How to resize the window application?
+
+    Edit the width and height properties in the [split json file](#main-object).
+
+- How to change the default keybinds?
+
+    For simplicity, you can edit the `urn-gtk.gschema.xml` file. See [Settings and keybinds](#modifying-the-default-values).
+
+- How to make the keybinds global
+
+    Set the `global-hotkeys` property as true. See [Settings and Keybinds](#settings-and-keybinds).
+
+- Can I modify the Urn appareance?
+
+    Yes. You can modify the default CSS theme (`themes/live-split`), download
+    [online themes](https://github.com/TheBlackParrot/urn-themes),
+    or [make your own theme](#themes).
+
+- How to make my own split file?
+
+    You can use `splits/sotn.json` as an example. You can place the
+    split files wherever you want, just open them when starting Urn.
+
+- Can I contribute?
+
+    Yes, you can contribute by making a pull request or by
+    [reporting issues](https://github.com/leflores-fisi/urn/issues). ✨
+---
 
 ## Uninstall Urn
 Uninstall the desktop application by running
