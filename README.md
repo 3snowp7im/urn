@@ -1,5 +1,15 @@
-# Urn split tracker
-![Urn](http://i.imgur.com/1ivi9EZ.png)
+
+<p align="center">
+    <img src="https://raw.githubusercontent.com/leflores-fisi/urn/master/urn.png" width=100 height=100/>
+</p>
+<h1 align="center">— Urn split tracker —</h1>
+
+<p align="center">
+    <img src="https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white"/>
+    <img src="https://img.shields.io/github/stars/leflores-fisi/Urn.svg?style=for-the-badge&labelColor=black&logo=Github"/>
+    <img src="https://img.shields.io/static/v1?label=Made%20with&message=GTK%203.0&color=725d9c&style=for-the-badge&logo=GTK&logoColor=white&labelColor=black"/>
+    <img src="https://img.shields.io/github/license/leflores-fisi/Urn?label=license&style=for-the-badge&logo=GNU&logoColor=white&labelColor=black&color=b85353"/>
+</p>
 
 ## About
 
@@ -8,10 +18,23 @@ It was originally written because there were no existing
 solutions for split tracking with a delayed start available
 on *nix platforms.
 
-Forked from the original project (rest in peace), the goal of
-this fork is to add some minor fixes and implement its pull requests.
+**Forked** from the [original project](https://github.com/3snowp7im/urn) (rest in peace).
 
-## Quick start
+Features added:
+- Now the last split folder is saved (by [@Thue](https://github.com/Thue))
+- New default theme (LiveSplit theme)
+- New shortcut to keep window always on top (Ctrl K)
+- More friendly README.md
+- Nicer time format
+- New Urn icon ✨
+
+Bugs fixed:
+- Timer kept running in the background while paused
+- User was able to skip the last split
+
+
+
+## Quick start and installation
 
 Urn requires `libgtk+-3.0`, `x11`, `libjansson`
 and installing requires `imagemagick`, and `rsync`.
