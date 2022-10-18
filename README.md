@@ -32,8 +32,9 @@
 - Timer kept running in the background while paused
 - User was able to skip the last split
 
+
 <p align="center">
-    <img src="https://raw.githubusercontent.com/leflores-fisi/urn/master/static/screenshot.png"/>
+    <img src="https://raw.githubusercontent.com/leflores-fisi/urn/master/static/screenshot.png" width=320/>
 </p>
 
 ---
