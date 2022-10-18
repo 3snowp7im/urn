@@ -1,6 +1,6 @@
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/leflores-fisi/urn/master/urn.png" width=100 height=100/>
+    <img src="https://raw.githubusercontent.com/leflores-fisi/urn/master/static/urn.png" width=100 height=100/>
 </p>
 <h1 align="center">— Urn split tracker —</h1>
 
@@ -13,10 +13,10 @@
 
 ## About
 
-This simple split tracker was hacked together by [3snow p7im](https://github.com/3snowp7im).
-It was originally written because there were no existing
-solutions for split tracking with a delayed start available
-on *nix platforms.
+> This simple split tracker was hacked together by [3snow p7im](https://github.com/3snowp7im).
+> It was originally written because there were no existing
+> solutions for split tracking with a delayed start available
+> on *nix platforms.
 
 **Forked** from the [original project](https://github.com/3snowp7im/urn) (rest in peace).
 
@@ -32,7 +32,11 @@ on *nix platforms.
 - Timer kept running in the background while paused
 - User was able to skip the last split
 
+<p align="center">
+    <img src="https://raw.githubusercontent.com/leflores-fisi/urn/master/static/screenshot.png"/>
+</p>
 
+---
 
 ## Quick start and installation
 
@@ -59,7 +63,9 @@ sudo make install
 
 All ready! Now start the desktop **Urn** application or run `/usr/local/bin/urn-gtk`.
 
-## Usage
+---
+
+## ✨ Usage
 
 When you start the **Urn** application, a file dialog will appear to select
 a Split JSON file (see [Split files](#split-files)).
@@ -104,18 +110,20 @@ See the [urn-gtk.gschema.xml](https://github.com/leflores-fisi/urn/blob/master/u
 
 | Keybind                      |         |                                    | Default |
 |------------------------------|---------|------------------------------------|---------|
-| `keybind-start-split`        | String  | Start/split keybind                | <kbd>space</kbd>
-| `keybind-stop-reset`         | String  | Stop/Reset keybind                 | <kbd>BackSpace</kbd>
+| `keybind-start-split`        | String  | Start/split keybind                | <kbd>Space</kbd>
+| `keybind-stop-reset`         | String  | Stop/Reset keybind                 | <kbd>Backspace</kbd>
 | `keybind-cancel`             | String  | Cancel keybind                     | <kbd>Delete</kbd>
-| `keybind-unsplit`            | String  | Unsplit keybind                    | <kbd>Page_Up</kbd>
-| `keybind-skip-split`         | String  | Skip split keybind                 | <kbd>Page_Down</kbd>
-| `keybind-toggle-decorations` | String  | Toggle window decorations keybind  | <kbd>Ctrl_R</kbd> (rigth)
+| `keybind-unsplit`            | String  | Unsplit keybind                    | <kbd>Page Up</kbd>
+| `keybind-skip-split`         | String  | Skip split keybind                 | <kbd>Page Down</kbd>
+| `keybind-toggle-decorations` | String  | Toggle window decorations keybind  | <kbd>Right Ctrl</kbd>
 
 ### Modifying the default values
 
 There is no settings dialog, but you can change
 the values in the `wildmouse.urn` path with `gsettings` or directly
-edit them in the [urn-gtk.gschema.xml](https://github.com/leflores-fisi/urn/blob/master/urn-gtk.gschema.xml) file and recompile.
+edit them in the [urn-gtk.gschema.xml](https://github.com/leflores-fisi/urn/blob/master/urn-gtk.gschema.xml) file.
+
+You must do `sudo make install` to get the required file `urn-gtk.gschema.xml` into the expected location.
 
 Keybind strings must be parseable by the
 [gtk_accelerator_parse](https://docs.gtk.org/gtk4/func.accelerator_parse.html).
@@ -158,8 +166,8 @@ wherever you want.
 
 ### Split object
 
-| Key          | Value                  |
-|--------------|------------------------|
+| Key          | Value                    |
+|--------------|--------------------------|
 | `title`        | Split title            |
 | `time`         | Split time             |
 | `best_time`    | Your best split time   |
@@ -252,7 +260,7 @@ targeting the CSS class `.split-title-first-split`.
 
 - Can I contribute?
 
-    Yes, you can contribute by making a pull request or by
+    Yes, you can contribute by making [pull requests](https://github.com/leflores-fisi/urn/pulls) or
     [reporting issues](https://github.com/leflores-fisi/urn/issues). ✨
 ---
 
