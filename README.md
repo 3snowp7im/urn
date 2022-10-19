@@ -5,7 +5,7 @@
 <h1 align="center">— Urn split tracker —</h1>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white"/>
+    <img src="https://img.shields.io/badge/c-%2300599C.svg?style=for-the-badge&logo=c&logoColor=white"/>
     <img src="https://img.shields.io/github/stars/leflores-fisi/Urn.svg?style=for-the-badge&labelColor=black&logo=Github"/>
     <img src="https://img.shields.io/static/v1?label=Made%20with&message=GTK%203.0&color=725d9c&style=for-the-badge&logo=GTK&logoColor=white&labelColor=black"/>
     <img src="https://img.shields.io/github/license/leflores-fisi/Urn?label=license&style=for-the-badge&logo=GNU&logoColor=white&labelColor=black&color=b85353"/>
