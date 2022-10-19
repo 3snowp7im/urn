@@ -114,9 +114,10 @@
   padding-right: 8px;
 }
 
-.sum-of-bests, .sum-of-bests-label {
+/* Comment this if you want to simplify the UI */
+/* .sum-of-bests, .sum-of-bests-label {
   font-size: 0;
 }
 .personal-best, .personal-best-label {
   font-size: 0;
-}
+} */
