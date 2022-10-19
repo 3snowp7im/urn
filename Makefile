@@ -11,7 +11,7 @@ LDLIBS      += `pkg-config --libs $(LIBS)`
 BIN_DIR     = /usr/local/bin
 APP         = urn.desktop
 APP_DIR     = /usr/share/applications
-ICON        = urn
+ICON        = urn.png
 ICON_DIR    = /usr/share/icons/hicolor
 SCHEMAS_DIR = /usr/share/glib-2.0/schemas
 
@@ -26,8 +26,8 @@ install:
 	cp $(BIN) $(BIN_DIR)
 	cp $(APP) $(APP_DIR)
 	for size in 16 22 24 32 36 48 64 72 96 128 256 512; do \
-	  convert $(ICON).png -resize "$$size"x"$$size" \
-	          $(ICON_DIR)/"$$size"x"$$size"/apps/$(ICON).png ; \
+	  convert static/$(ICON) -resize "$$size"x"$$size" \
+	          $(ICON_DIR)/"$$size"x"$$size"/apps/$(ICON) ; \
 	done
 	gtk-update-icon-cache -f -t $(ICON_DIR)
 	cp urn-gtk.gschema.xml $(SCHEMAS_DIR)
@@ -40,7 +40,7 @@ uninstall:
 	rm -f $(APP_DIR)/$(APP)
 	rm -rf /usr/share/urn
 	for size in 16 22 24 32 36 48 64 72 96 128 256 512; do \
-	  rm -f $(ICON_DIR)/"$$size"x"$$size"/apps/$(ICON).png ; \
+	  rm -f $(ICON_DIR)/"$$size"x"$$size"/apps/$(ICON) ; \
 	done
 
 remove-schema:
