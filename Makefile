@@ -8,12 +8,14 @@ LIBS        = gtk+-3.0 x11 jansson
 CFLAGS      += `pkg-config --cflags $(LIBS)` -Wall -Wno-unused-parameter -std=gnu99 -I/usr/include/gtk-3.0/
 LDLIBS      += `pkg-config --libs $(LIBS)`
 
-BIN_DIR     = /usr/local/bin
+PREFIX      = /usr/local
+BIN_DIR     = $(PREFIX)/bin
 APP         = urn.desktop
-APP_DIR     = /usr/share/applications
+DATADIR     = $(PREFIX)/share
+APP_DIR     = $(DATADIR)/applications
 ICON        = urn.png
-ICON_DIR    = /usr/share/icons/hicolor
-SCHEMAS_DIR = /usr/share/glib-2.0/schemas
+ICON_DIR    = $(DATADIR)/icons/hicolor
+SCHEMAS_DIR = $(DATADIR)/glib-2.0/schemas
 
 $(BIN): $(OBJS)
 
@@ -33,13 +35,13 @@ install:
 	gtk-update-icon-cache -f -t $(ICON_DIR)
 	install -Dm644 urn-gtk.gschema.xml $(SCHEMAS_DIR)/urn-gtk.gschema.xml
 	glib-compile-schemas $(SCHEMAS_DIR)
-	mkdir -p /usr/share/urn/themes
-	rsync -a --exclude=".*" themes /usr/share/urn
+	mkdir -p $(DATADIR)/urn/themes
+	rsync -a --exclude=".*" themes $(DATADIR)/urn
 
 uninstall:
 	rm -f $(BIN_DIR)/$(BIN)
 	rm -f $(APP_DIR)/$(APP)
-	rm -rf /usr/share/urn
+	rm -rf $(DATADIR)/urn
 	for size in 16 22 24 32 36 48 64 72 96 128 256 512; do \
 	  rm -f $(ICON_DIR)/"$$size"x"$$size"/apps/$(ICON) ; \
 	done
